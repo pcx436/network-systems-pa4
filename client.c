@@ -16,6 +16,10 @@ void initDFC(const char *fileName, dfc *config) {
 	char lineBuffer[MAX_LINE];
 	struct addrinfo hints, *results;
 
+	if ((file = fopen(fileName, "r")) == NULL)
+		return;
+
+	fclose(file);
 }
 
 void destroyDFC(dfc *config) {

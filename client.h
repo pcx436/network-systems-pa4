@@ -4,6 +4,7 @@
 
 #ifndef NETWORK_SYSTEMS_PA4_CLIENT_H
 #define NETWORK_SYSTEMS_PA4_CLIENT_H
+#include "macro.h"
 
 typedef struct {
 	int firstServerSocket;

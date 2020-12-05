@@ -12,7 +12,7 @@ typedef struct {
 	int thirdServerSocket;
 	int fourthServerSocket;
 	char username[MAX_USERNAME];
-	char *password;
+	char password[MAX_PASSWORD];
 } dfc;
 
 void initDFC(const char *fileName, dfc *config);

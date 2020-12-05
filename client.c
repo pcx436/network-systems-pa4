@@ -3,6 +3,8 @@
 //
 
 #include "client.h"
+#include <stdio.h>
+#include <netdb.h>
 
 /**
  * Initialize a DFC
@@ -10,6 +12,9 @@
  * @param config	Pointer to the config to build
  */
 void initDFC(const char *fileName, dfc *config) {
+	FILE *file;
+	char lineBuffer[MAX_LINE];
+	struct addrinfo hints, *results;
 
 }
 

@@ -7,3 +7,7 @@
 void initDFC(const char *fileName, dfc *config) {
 
 }
+
+void destroyDFC(dfc *config) {
+
+}

@@ -5,12 +5,13 @@
 #ifndef NETWORK_SYSTEMS_PA4_CLIENT_H
 #define NETWORK_SYSTEMS_PA4_CLIENT_H
 #include "macro.h"
+#include <sys/socket.h>
 
 typedef struct {
-	int firstServerSocket;
-	int secondServerSocket;
-	int thirdServerSocket;
-	int fourthServerSocket;
+	struct sockaddr firstServerSocket;
+	struct sockaddr secondServerSocket;
+	struct sockaddr thirdServerSocket;
+	struct sockaddr fourthServerSocket;
 	char username[MAX_USERNAME];
 	char password[MAX_PASSWORD];
 } dfc;

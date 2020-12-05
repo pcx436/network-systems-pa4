@@ -3,3 +3,7 @@
 //
 
 #include "client.h"
+
+void initDFC(const char *fileName, dfc *config) {
+
+}

@@ -11,7 +11,7 @@ typedef struct {
 	int secondServerSocket;
 	int thirdServerSocket;
 	int fourthServerSocket;
-	char *username;
+	char username[MAX_USERNAME];
 	char *password;
 } dfc;
 

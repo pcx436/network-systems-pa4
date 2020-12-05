@@ -7,5 +7,6 @@
 
 #define MAX_USERNAME    1024
 #define MAX_PASSWORD    1024
+#define MAX_LINE        1024
 
 #endif //NETWORK_SYSTEMS_PA4_MACRO_H

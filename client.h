@@ -14,4 +14,8 @@ typedef struct {
 	char *password;
 } dfc;
 
+void initDFC(const char *fileName, dfc *config);
+
+void destroyDFC(dfc *config);
+
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

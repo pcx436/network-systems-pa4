@@ -80,3 +80,58 @@ int makeSocket(int family) {
 
 	return sockfd;
 }
+
+int * pingServers(dfc *config) {
+	int i, socket, *online, error;
+	char *pingCommand;
+	char response[1024];
+	// 7 = 2 \n + 1 \0 + "ping"
+	size_t pingSize = strlen(config->username) + strlen(config->password) + 7, ioSize;
+
+	if (config == NULL)
+		return NULL;
+	if ((online = malloc(sizeof(int) * 4)) == NULL)
+		return NULL;
+
+	// default 0 offline, 1 if online
+	for (i = 0; i < 4; i++)
+		online[i] = 0;
+
+	if ((pingCommand = malloc(sizeof(char) * pingSize)) == NULL) {
+		free(online);
+		return NULL;
+	}
+	// build ping command
+	sprintf(pingCommand, "%s\n%s\nping", config->username, config->password);
+
+	for (i = 0; i < 4; i++) {
+		if ((socket = makeSocket(config->serverInfo[i]->ai_family)) != -1) {
+			error = connect(socket, config->serverInfo[i]->ai_addr, config->serverInfo[i]->ai_addrlen);
+
+			if (error == 0 && (ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) != -1) {
+				ioSize = recv(socket, response, 1024, 0);
+				if (strncmp("pong", response, 4) == 0)
+					online[i] = 1;
+			}
+			close(socket);
+		} else {
+			fprintf(stderr, "failed to ping servers!\n");
+			i = 5;  // break
+		}
+	}
+
+	free(pingCommand);
+	return online;
+}
+
+int countOnes(const int *online) {
+	int c = 0, i;
+	if (online == NULL)
+		return -1;
+
+	for (i = 0; i < 4; i++)
+		if (online[i] == 1)
+			c++;
+
+	return c;
+}

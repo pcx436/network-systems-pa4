@@ -283,12 +283,6 @@ void *get(dfc config, const char *fileName) {
 					// keep track of end pointer
 					end = responseBuffer + bytesReceived;
 
-
-					// continuing receive of part from last loop iteration
-					// still bytes left, we're not supposed to skip them, and we know which part to put them in
-					if (pointInResponse < end && skipCount == 0 && partDesignation != -1) {
-					}
-
 					// still data left in buffer, begin parsing as new info block
 					while (pointInResponse < end) {
 						// in case we've already seen this part, skip it

@@ -93,7 +93,7 @@ int makeSocket(struct addrinfo *info) {
 int * pingServers(dfc config) {
 	int i, socket, *online, error;
 	char *pingCommand;
-	char response[1024];
+	char response[MAX_BUFFER];
 	// 7 = 2 \n + 1 \0 + "ping"
 	size_t pingSize = strlen(config.username) + strlen(config.password) + 7, ioSize;
 

@@ -11,6 +11,7 @@
 
 typedef struct {
 	struct sockaddr_in *dfsSockets[4];
+	socklen_t lengths[4];
 	char username[MAX_USERNAME];
 	char password[MAX_PASSWORD];
 } dfc;

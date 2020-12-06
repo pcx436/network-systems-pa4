@@ -247,7 +247,8 @@ void *get(dfc config, const char *fileName) {
 	// (no [] transmitted, used to show separation of parts)
 	int i, socketIndex, sizeIndex, whichFile, socket;
 	FILE *file;
-	char *query, *parts[4], responseBuffer[MAX_BUFFER];
+	void *parts[4];
+	char *query, responseBuffer[MAX_BUFFER];
 	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
 	ssize_t bytesReceived;
 	size_t queryLength = strlen(config.username) + strlen(config.password);

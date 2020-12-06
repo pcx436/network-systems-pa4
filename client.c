@@ -18,7 +18,7 @@ int main(int argc, const char *argv[]) {
 
 	if (argc != 2) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
-		printf("Usage: %s [configuration file]", argv[0]);
+		printf("Usage: %s [configuration file]\n", argv[0]);
 		return 1;
 	}
 

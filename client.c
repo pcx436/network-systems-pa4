@@ -36,17 +36,9 @@ int main(int argc, const char *argv[]) {
 		trimSpace(fullCommand);
 
 		if (strncmp("list", fullCommand, 4) == 0) {
-			serverPing = pingServers(&config);
-			printf("%d servers online\n", countOnes(serverPing));
-			free(serverPing);
+			list(config);
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
-			serverPing = pingServers(&config);
-			printf("%d servers online\n", countOnes(serverPing));
-			free(serverPing);
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
-			serverPing = pingServers(&config);
-			printf("%d servers online\n", countOnes(serverPing));
-			free(serverPing);
 		} else if (strncmp("help", fullCommand, 4) == 0) {
 			displayHelp();
 		} else if (strncmp("exit", fullCommand, 4) == 0) {

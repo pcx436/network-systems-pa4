@@ -259,5 +259,11 @@ void *get(dfc config, const char *fileName) {
 	// build query
 	sprintf(query, "%s\n%s\nget %s", config.username, config.password, fileName);
 
+	// init partSize and parts arrays
+	for (i = 0; i < 4; i++) {
+		partSize[i] = 0;
+		parts[i] = NULL;
+	}
+
 	return NULL;
 }

@@ -31,9 +31,9 @@ int main(int argc, const char *argv[]) {
 	printf("\tget [FILE]: retrieves a file from the DFS\n\tput [FILE]: sends a file to the DFS\n\t"
 		"list: lists all available files in the DFS\n\texit: terminates the DFC\n");
 
-	do {
+	while (killed == 0) {
 
-	} while (killed == 0);
+	}
 
 	return 0;
 }

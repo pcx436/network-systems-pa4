@@ -59,14 +59,14 @@ void displayHelp() {
 		"list: lists all available files in the DFS\n\thelp: display this message\n\texit: terminates the DFC\n");
 }
 
-int makeSocket(int family) {
+int makeSocket(struct addrinfo *info) {
 	int sockfd;
 	struct timeval t;
 	t.tv_sec = 1;
 	t.tv_usec = 0;
 
 	// create socket and set timeout
-	if ((sockfd = socket(family, SOCK_STREAM, 0)) != -1) {
+	if ((sockfd = socket(info->ai_family, SOCK_STREAM, 0)) != -1) {
 		if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&t, sizeof(t)) == -1 ||
 				setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&t, sizeof(t)) == -1) {
 			perror("Socket setup failed");
@@ -80,15 +80,13 @@ int makeSocket(int family) {
 	return sockfd;
 }
 
-int * pingServers(dfc *config) {
+int * pingServers(dfc config) {
 	int i, socket, *online, error;
 	char *pingCommand;
 	char response[1024];
 	// 7 = 2 \n + 1 \0 + "ping"
-	size_t pingSize = strlen(config->username) + strlen(config->password) + 7, ioSize;
+	size_t pingSize = strlen(config.username) + strlen(config.password) + 7, ioSize;
 
-	if (config == NULL)
-		return NULL;
 	if ((online = malloc(sizeof(int) * 4)) == NULL)
 		return NULL;
 
@@ -101,11 +99,10 @@ int * pingServers(dfc *config) {
 		return NULL;
 	}
 	// build ping command
-	sprintf(pingCommand, "%s\n%s\nping", config->username, config->password);
+	sprintf(pingCommand, "%s\n%s\nping", config.username, config.password);
 
 	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config->serverInfo[i]->ai_family)) != -1) {
-			error = connect(socket, config->serverInfo[i]->ai_addr, config->serverInfo[i]->ai_addrlen);
+		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
 
 			if (error == 0 && (ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) != -1) {
 				ioSize = recv(socket, response, 1024, 0);

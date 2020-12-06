@@ -7,8 +7,8 @@
 #include "configParser.h"
 
 void displayHelp();
-int makeSocket(int family);
-int * pingServers(dfc *config);
+int makeSocket(struct addrinfo *info);
+int * pingServers(dfc config);
 int countOnes(const int *online);
 
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

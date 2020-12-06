@@ -280,38 +280,94 @@ void *get(dfc config, const char *fileName) {
 					// set pointInResponse to start of buffer
 					pointInResponse = responseBuffer;
 
-					// determine if currently receiving file info or at start of info block
-					for (sizeIndex = 0, whichFile = -1; sizeIndex < 4 && whichFile == -1; sizeIndex++) {
-						if (partSize[sizeIndex] != -1 && currentSize[sizeIndex] < partSize[sizeIndex])
-							whichFile = sizeIndex;
-					}
+					// keep track of end pointer
+					end = responseBuffer + bytesReceived;
+
 
 					// continuing receive of part from last loop iteration
-					if (whichFile != -1) {
-						// determine if current file takes up entire received buffer or only part
-						remainder = partSize[whichFile] - currentSize[whichFile];
-						if (bytesReceived <= remainder)
-							toCopy = bytesReceived;
-						else
-							toCopy = remainder;
-
-						// "append" received bytes to the end of the part in question
-						memcpy(parts[whichFile] + currentSize[whichFile], responseBuffer, toCopy);
-						currentSize[whichFile] += toCopy;
-
-						// shift pointInResponse in reaction to copy
-						pointInResponse += toCopy;
+					// still bytes left, we're not supposed to skip them, and we know which part to put them in
+					if (pointInResponse < end && skipCount == 0 && partDesignation != -1) {
 					}
 
-					// still stuff left in buffer, begin parsing as new info block
-					if (pointInResponse < responseBuffer + bytesReceived) {
+					// still data left in buffer, begin parsing as new info block
+					while (pointInResponse < end) {
+						// in case we've already seen this part, skip it
+						if (skipCount > 0 && skipCount <= bytesReceived) {
+							pointInResponse += skipCount;
+							skipCount = 0;
+							partDesignation = -1;  // skipped finished
+						}
+						else if (skipCount > 0) {
+							skipCount -= bytesReceived;
+							pointInResponse += bytesReceived;
+						}
+						else if ((partDesignation == -1 || partSize[partDesignation] == -1) && pointInResponse[0] == '\n') {
+							// skip newline
+							pointInResponse += 1;
+						}
+						else if (partDesignation == -1) {
+							partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
+							pointInResponse += 2;  // skip designation and newline
+							bytesReceived -= 2;
+						}
+						else if (partSize[partDesignation] == -1) {
+							if ((token = strchr(pointInResponse, '\n')) != NULL) {
+								token[0] = '\0';
+								strcat(partsOfSize, pointInResponse);
 
+								parsedSize = strtol(partsOfSize, NULL, 10);
+								bzero(partsOfSize, MAX_BUFFER);  // wipe for next block
+								bytesReceived -= strlen(pointInResponse) + 1;  // "file size" + \n
+								token[0] = '\n';
+
+								// start at data chunk
+								pointInResponse = token + 1;
+
+								// new part
+								if (partSize[partDesignation] == -1) {
+									skipCount = 0;
+									partSize[partDesignation] = parsedSize;
+
+									// if there is a higher power, I beg of them to never let this condition be true
+									if ((parts[partDesignation] = malloc(parsedSize)) == NULL) {
+										perror("Failed allocating space for file part");
+										partSize[partDesignation] = -1;
+										partDesignation = -1;
+									}
+								} else {  // seen part, skip it
+									skipCount = parsedSize;
+								}
+							}
+							else {
+								strcat(partsOfSize, pointInResponse);
+								pointInResponse = end;
+							}
+						}
+						else {  // partDesignation != -1, partSize[partDesignation] != -1, not skipping
+							// determine if current file takes up entire received buffer or only part
+							remainder = partSize[partDesignation] - currentSize[partDesignation];
+							if (bytesReceived <= remainder)
+								toCopy = bytesReceived;
+							else
+								toCopy = remainder;
+
+							// "append" received bytes to the end of the part in question
+							memcpy(parts[partDesignation] + currentSize[partDesignation], responseBuffer, toCopy);
+							currentSize[partDesignation] += toCopy;
+
+							if (toCopy == remainder)
+								partDesignation = -1;
+
+							// shift pointInResponse in reaction to copy
+							pointInResponse += toCopy;
+							bytesReceived -= toCopy;
+						}
 					}
 				}
 			}
-
 			close(socket);
 		}
+
 	}
 
 	free(query);

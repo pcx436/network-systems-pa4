@@ -49,6 +49,7 @@ int main(int argc, const char *argv[]) {
 		}
 	}
 
+	destroyDFC(&config);
 	return 0;
 }
 

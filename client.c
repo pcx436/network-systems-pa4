@@ -258,6 +258,7 @@ void *get(dfc config, const char *fileName) {
 
 	if ((query = malloc(queryLength)) == NULL)
 		return NULL;
+	bzero(partsOfSize, MAX_BUFFER);
 
 	// build query
 	sprintf(query, "%s\n%s\nget %s", config.username, config.password, fileName);

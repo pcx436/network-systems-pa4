@@ -27,15 +27,21 @@ int main(int argc, const char *argv[]) {
 		return 1;
 
 	// display intro
-	printf("Welcome to Jacob's Distributed File System Client! Your available commands are:\n");
-	printf("\tget [FILE]: retrieves a file from the DFS\n\tput [FILE]: sends a file to the DFS\n\t"
-		"list: lists all available files in the DFS\n\texit: terminates the DFC\n");
+	printf("Welcome to Jacob's Distributed File System Client!\n");
+	displayHelp();
 
 	while (killed == 0) {
 		printf("> ");
 	}
 
 	return 0;
+}
+
+void displayHelp() {
+	printf("Your available commands are:\n");
+	printf("\tget [FILE]: retrieves a file from the DFS\n\t"
+		"put [FILE]: sends a file to the DFS\n\t"
+		"list: lists all available files in the DFS\n\thelp: display this message\n\texit: terminates the DFC\n");
 }
 
 void sigintHandler(int useless) { killed = 1; }

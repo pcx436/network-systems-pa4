@@ -268,5 +268,12 @@ void *get(dfc config, const char *fileName) {
 		parts[i] = NULL;
 	}
 
+	// loop through all DFS to grab file parts
+	for (i = 0; i < 4; i++) {
+		if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
+			close(socket);
+		}
+	}
+
 	return NULL;
 }

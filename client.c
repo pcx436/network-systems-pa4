@@ -6,7 +6,6 @@
 #include "common.h"
 #include "configParser.h"
 #include <stdio.h>
-#include <signal.h>
 
 static volatile int killed = 0;
 
@@ -15,8 +14,6 @@ int main(int argc, const char *argv[]) {
 	int numServers;
 	char fullCommand[MAX_COMMAND], *tokenSave;
 	int exit = 0;
-
-	signal(SIGINT, sigintHandler);
 
 	if (argc != 2) {
 		fprintf(stderr, "Incorrect number of arguments.\n");

@@ -104,18 +104,20 @@ int makeSocket(struct addrinfo *info) {
 			close(sockfd);
 			sockfd = -1;
 		} else {
+			// attempt connection
 			if (connect(sockfd, info->ai_addr, info->ai_addrlen) == -1) {
 #ifdef DEBUG
 				perror("ERROR");
 #endif
 				close(sockfd);
-				sockfd = -1;
+				sockfd = -2;
 			}
 		}
 	} else {
 #ifdef DEBUG
 		perror("Socket setup failed");
 #endif
+		sockfd = -3;
 	}
 
 	return sockfd;

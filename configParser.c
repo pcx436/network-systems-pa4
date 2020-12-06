@@ -43,7 +43,7 @@ int initDFC(const char *fileName, dfc *config) {
 	hints.ai_family = AF_INET;
 
 	for(i = 0; i < 4; i++)
-		config->dfsSockets[i] = NULL;
+		config->serverInfo[i] = NULL;
 
 	while ((bytesRead = getline(&lineBuffer, &bufferSize, file)) != -1) {
 		trimSpace(lineBuffer);

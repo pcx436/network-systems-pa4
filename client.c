@@ -299,6 +299,10 @@ void *get(dfc config, const char *fileName) {
 						// shift pointInResponse in reaction to copy
 						pointInResponse += toCopy;
 					}
+
+					// still stuff left in buffer, begin parsing as new info block
+					if (pointInResponse < responseBuffer + bytesReceived) {
+
 					}
 				}
 			}

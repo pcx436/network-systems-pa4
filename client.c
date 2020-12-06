@@ -243,5 +243,8 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 }
 
 void *get(dfc config, const char *fileName) {
+	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
+	// (no [] transmitted, used to show separation of parts)
+
 	return NULL;
 }

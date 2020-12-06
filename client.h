@@ -14,8 +14,10 @@ typedef struct {
 	char password[MAX_PASSWORD];
 } dfc;
 
-void initDFC(const char *fileName, dfc *config);
+int initDFC(const char *fileName, dfc *config);
 
 void destroyDFC(dfc *config);
+
+void trimSpace(char *s);
 
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

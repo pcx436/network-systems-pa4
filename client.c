@@ -69,9 +69,19 @@ int makeSocket(struct addrinfo *info) {
 	if ((sockfd = socket(info->ai_family, SOCK_STREAM, 0)) != -1) {
 		if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&t, sizeof(t)) == -1 ||
 				setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&t, sizeof(t)) == -1) {
+#ifndef DEBUG
 			perror("Socket setup failed");
+#endif
 			close(sockfd);
 			sockfd = -1;
+		} else {
+			if (connect(sockfd, info->ai_addr, info->ai_addrlen) == -1) {
+#ifndef DEBUG
+				perror("ERROR");
+#endif
+				close(sockfd);
+				sockfd = -1;
+			}
 		}
 	} else {
 		perror("Socket setup failed");

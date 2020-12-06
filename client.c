@@ -32,7 +32,7 @@ int main(int argc, const char *argv[]) {
 		"list: lists all available files in the DFS\n\texit: terminates the DFC\n");
 
 	while (killed == 0) {
-
+		printf("> ");
 	}
 
 	return 0;

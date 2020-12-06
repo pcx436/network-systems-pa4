@@ -6,6 +6,7 @@
 #include "common.h"
 #include "configParser.h"
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, const char *argv[]) {
 	dfc config;
@@ -32,9 +33,19 @@ int main(int argc, const char *argv[]) {
 		fgets(fullCommand, MAX_COMMAND, stdin);
 		trimSpace(fullCommand);
 
-		
-		// TODO: remove this once I have the command parsing in. It's only here to shut my editor up
-		exit = 1;
+		if (strncmp("list", fullCommand, 4) == 0) {
+
+		} else if (strncmp("put ", fullCommand, 4) == 0) {
+
+		} else if (strncmp("get ", fullCommand, 4) == 0) {
+
+		} else if (strncmp("help", fullCommand, 4) == 0) {
+
+		} else if (strncmp("exit", fullCommand, 4) == 0) {
+			exit = 1;
+		} else {
+			fprintf(stderr, "Unknown command \"%s\", enter \"help\" to see available commands.\n", fullCommand);
+		}
 	}
 
 	return 0;

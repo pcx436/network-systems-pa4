@@ -41,7 +41,7 @@ int main(int argc, const char *argv[]) {
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
 
 		} else if (strncmp("help", fullCommand, 4) == 0) {
-
+			displayHelp();
 		} else if (strncmp("exit", fullCommand, 4) == 0) {
 			exit = 1;
 		} else {

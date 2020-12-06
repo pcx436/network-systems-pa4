@@ -334,6 +334,7 @@ void *get(dfc config, const char *fileName) {
 										perror("Failed allocating space for file part");
 										partSize[partDesignation] = -1;
 										partDesignation = -1;
+										pointInResponse = end;
 									}
 								} else {  // seen part, skip it
 									skipCount = parsedSize;

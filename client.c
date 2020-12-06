@@ -7,8 +7,6 @@
 #include "configParser.h"
 #include <stdio.h>
 
-static volatile int killed = 0;
-
 int main(int argc, const char *argv[]) {
 	dfc config;
 	int numServers;
@@ -46,5 +44,3 @@ void displayHelp() {
 		"put [FILE]: sends a file to the DFS\n\t"
 		"list: lists all available files in the DFS\n\thelp: display this message\n\texit: terminates the DFC\n");
 }
-
-void sigintHandler(int useless) { killed = 1; }

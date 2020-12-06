@@ -7,6 +7,7 @@
 #include "configParser.h"
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
@@ -57,4 +58,25 @@ void displayHelp() {
 	printf("\tget [FILE]: retrieves a file from the DFS\n\t"
 		"put [FILE]: sends a file to the DFS\n\t"
 		"list: lists all available files in the DFS\n\thelp: display this message\n\texit: terminates the DFC\n");
+}
+
+int makeSocket(int family) {
+	int sockfd;
+	struct timeval t;
+	t.tv_sec = 1;
+	t.tv_usec = 0;
+
+	// create socket and set timeout
+	if ((sockfd = socket(family, SOCK_STREAM, 0)) != -1) {
+		if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&t, sizeof(t)) == -1 ||
+				setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&t, sizeof(t)) == -1) {
+			perror("Socket setup failed");
+			close(sockfd);
+			sockfd = -1;
+		}
+	} else {
+		perror("Socket setup failed");
+	}
+
+	return sockfd;
 }

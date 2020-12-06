@@ -6,5 +6,6 @@
 #define NETWORK_SYSTEMS_PA4_CLIENT_H
 
 void displayHelp();
+int makeSocket(int family);
 
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

@@ -248,7 +248,7 @@ void *get(dfc config, const char *fileName) {
 	int i, socketIndex, sizeIndex, whichFile, socket;
 	FILE *file;
 	void *parts[4];
-	char *query, responseBuffer[MAX_BUFFER];
+	char *query, *pointInResponse, responseBuffer[MAX_BUFFER];
 	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
 	ssize_t bytesReceived, toCopy, remainder;
 	size_t queryLength = strlen(config.username) + strlen(config.password);
@@ -274,6 +274,9 @@ void *get(dfc config, const char *fileName) {
 		if ((socket = makeSocket(config.serverInfo[socketIndex])) >= 0) {
 			if (send(socket, query, queryLength, 0) != -1) {
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
+					// set pointInResponse to start of buffer
+					pointInResponse = responseBuffer;
+
 					// determine if currently receiving file info or at start of info block
 					for (sizeIndex = 0, whichFile = -1; sizeIndex < 4 && whichFile == -1; sizeIndex++) {
 						if (partSize[sizeIndex] != -1 && currentSize[sizeIndex] < partSize[sizeIndex])
@@ -294,6 +297,10 @@ void *get(dfc config, const char *fileName) {
 						// "append" received bytes to the end of the part in question
 						memcpy(parts[whichFile] + currentSize[whichFile], responseBuffer, toCopy);
 						currentSize[whichFile] += toCopy;
+
+						// shift pointInResponse in reaction to copy
+						pointInResponse += toCopy;
+					}
 					}
 				}
 			}

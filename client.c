@@ -6,6 +6,8 @@
 #include "configParser.h"
 #include <stdio.h>
 
+static volatile int killed = 0;
+
 int main(int argc, const char *argv[]) {
 	dfc config;
 	int numServers;
@@ -21,3 +23,5 @@ int main(int argc, const char *argv[]) {
 
 	return 0;
 }
+
+void sigintHandler(int useless) { killed = 1; }

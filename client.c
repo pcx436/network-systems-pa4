@@ -245,7 +245,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 void *get(dfc config, const char *fileName) {
 	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
 	// (no [] transmitted, used to show separation of parts)
-	int i, socket;
+	int i, socketIndex, socket;
 	FILE *file;
 	char *query, *parts[4], responseBuffer[MAX_BUFFER];
 	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
@@ -269,8 +269,8 @@ void *get(dfc config, const char *fileName) {
 	}
 
 	// loop through all DFS to grab file parts
-	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
+	for (socketIndex = 0; socketIndex < 4; socketIndex++) {
+		if ((socket = makeSocket(config.serverInfo[socketIndex])) >= 0) {
 			if (send(socket, query, queryLength, 0) != -1) {
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
 				}

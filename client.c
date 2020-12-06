@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
 	dfc config;
 	char fullCommand[MAX_COMMAND], *tokenSave, *param;
-	int exit = 0;
+	int exit = 0, *serverPing;
 
 	if (argc != 2) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
@@ -35,11 +36,17 @@ int main(int argc, const char *argv[]) {
 		trimSpace(fullCommand);
 
 		if (strncmp("list", fullCommand, 4) == 0) {
-
+			serverPing = pingServers(&config);
+			printf("%d servers online\n", countOnes(serverPing));
+			free(serverPing);
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
-
+			serverPing = pingServers(&config);
+			printf("%d servers online\n", countOnes(serverPing));
+			free(serverPing);
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
-
+			serverPing = pingServers(&config);
+			printf("%d servers online\n", countOnes(serverPing));
+			free(serverPing);
 		} else if (strncmp("help", fullCommand, 4) == 0) {
 			displayHelp();
 		} else if (strncmp("exit", fullCommand, 4) == 0) {

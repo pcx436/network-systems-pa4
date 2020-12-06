@@ -239,3 +239,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 	free(query);
 	return numFiles;
 }
+
+void *get(dfc config, const char *fileName) {
+	return NULL;
+}

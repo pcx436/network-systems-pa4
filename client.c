@@ -10,7 +10,7 @@
 int main(int argc, const char *argv[]) {
 	dfc config;
 	int numServers;
-	char fullCommand[MAX_COMMAND], *tokenSave;
+	char fullCommand[MAX_COMMAND], *tokenSave, *commandWord, *commandOption;
 	int exit = 0;
 
 	if (argc != 2) {

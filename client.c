@@ -245,7 +245,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 void *get(dfc config, const char *fileName) {
 	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
 	// (no [] transmitted, used to show separation of parts)
-	int i, socketIndex, sizeIndex, socket;
+	int i, socketIndex, sizeIndex, whichFile, socket;
 	FILE *file;
 	char *query, *parts[4], responseBuffer[MAX_BUFFER];
 	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
@@ -274,6 +274,10 @@ void *get(dfc config, const char *fileName) {
 			if (send(socket, query, queryLength, 0) != -1) {
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
 					// determine if currently receiving file info or at start of info block
+					for (sizeIndex = 0, whichFile = -1; sizeIndex < 4 && whichFile == -1; sizeIndex++) {
+						if (partSize[sizeIndex] != -1 && currentSize[sizeIndex] < partSize[sizeIndex])
+							whichFile = sizeIndex;
+					}
 				}
 			}
 

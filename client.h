@@ -5,10 +5,12 @@
 #ifndef NETWORK_SYSTEMS_PA4_CLIENT_H
 #define NETWORK_SYSTEMS_PA4_CLIENT_H
 #include "configParser.h"
+#define START_LIST_FILES  8192
 
 void displayHelp();
 int makeSocket(struct addrinfo *info);
 int * pingServers(dfc config);
+int list(dfc config);
 int countOnes(const int *online);
 
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

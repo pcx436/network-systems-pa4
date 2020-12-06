@@ -311,6 +311,7 @@ void *get(dfc config, const char *fileName) {
 							bytesReceived -= 2;
 						}
 						else if (partSize[partDesignation] == -1) {
+							// found the end of the part size
 							if ((token = strchr(pointInResponse, '\n')) != NULL) {
 								token[0] = '\0';
 								strcat(partsOfSize, pointInResponse);

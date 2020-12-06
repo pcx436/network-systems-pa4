@@ -13,8 +13,11 @@
 
 int main(int argc, const char *argv[]) {
 	dfc config;
+	distributedFile *files;
+	size_t fileCapacity;
 	char fullCommand[MAX_COMMAND], *tokenSave, *param;
-	int exit = 0, *serverPing;
+	int exit = 0, numFiles, anyMissing;
+	int i, j;
 
 	if (argc != 2) {
 		fprintf(stderr, "Incorrect number of arguments.\n");
@@ -36,7 +39,33 @@ int main(int argc, const char *argv[]) {
 		trimSpace(fullCommand);
 
 		if (strncmp("list", fullCommand, 4) == 0) {
-			list(config);
+			if ((files = malloc(sizeof(distributedFile) * START_LIST_FILES)) == NULL) {
+#ifdef DEBUG
+				fprintf(stderr, "Failed to allocate room for list buffer\n");
+#else
+				fprintf(stderr, "An issue occured trying to list the files, sorry!\n");
+#endif
+			}
+			else {
+				fileCapacity = START_LIST_FILES;
+				numFiles = list(config, files, &fileCapacity);
+
+				// print list
+				for (i = 0; i < numFiles; i++) {
+					anyMissing = 0;
+					printf("%s", files[i].name);
+					for (j = 0; j < 4 && anyMissing == 0; j++)
+						if (files[i].parts[j] == 0)
+							anyMissing = 1;
+
+					if (anyMissing == 1)
+						printf(" [incomplete]");
+					printf("\n");
+
+					free(files[i].name);
+				}
+				free(files);
+			}
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
 		} else if (strncmp("help", fullCommand, 4) == 0) {
@@ -69,14 +98,14 @@ int makeSocket(struct addrinfo *info) {
 	if ((sockfd = socket(info->ai_family, SOCK_STREAM, 0)) != -1) {
 		if (setsockopt (sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&t, sizeof(t)) == -1 ||
 				setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&t, sizeof(t)) == -1) {
-#ifndef DEBUG
+#ifdef DEBUG
 			perror("Socket setup failed");
 #endif
 			close(sockfd);
 			sockfd = -1;
 		} else {
 			if (connect(sockfd, info->ai_addr, info->ai_addrlen) == -1) {
-#ifndef DEBUG
+#ifdef DEBUG
 				perror("ERROR");
 #endif
 				close(sockfd);
@@ -84,7 +113,9 @@ int makeSocket(struct addrinfo *info) {
 			}
 		}
 	} else {
+#ifdef DEBUG
 		perror("Socket setup failed");
+#endif
 	}
 
 	return sockfd;
@@ -142,20 +173,14 @@ int countOnes(const int *online) {
 	return c;
 }
 
-// FIXME: Failing when receiving a response from 2+ servers
-int list(dfc config) {
-	int i, j, anyMissing, socket, ioCount, numFiles = 0,
-	fileDesignation, fileIndex = -1, listCapacity = START_LIST_FILES;
+int list(dfc config, distributedFile *files, size_t *capacity) {
+	int i, j, socket, numFiles = 0,
+	fileDesignation, fileIndex;
 	size_t querySize = strlen(config.username) + strlen(config.password) + 7;
-	char *query, response[MAX_BUFFER], *line, *name, *lineSavePoint, *designationPoint, designationChar;
-	distributedFile *files;
+	char *query, response[MAX_BUFFER], *line, *lineSavePoint, *designationPoint, *dotPoint;
 
 	if ((query = malloc(sizeof(char) * querySize)) == NULL)
 		return -2;
-	if ((files = malloc(sizeof(distributedFile) * START_LIST_FILES)) == NULL) {
-		free(query);
-		return -3;
-	}
 
 	// build query
 	sprintf(query, "%s\n%s\nlist", config.username, config.password);
@@ -172,10 +197,12 @@ int list(dfc config) {
 
 						// grab the last character
 						designationPoint = line + strlen(line) - 1;
-						designationChar = designationPoint[0];
+						dotPoint = line + strlen(line) - 2;
 
 						fileDesignation = (int)strtol(designationPoint, NULL, 10);
-						line[strlen(line) - 2] = '\0';
+
+						// temporarily null the ".n" at the end to get the full file name
+						dotPoint[0] = '\0';
 
 						for (j = 0, fileIndex = -1; j < numFiles && fileIndex == -1; j++) {
 							if (strcmp(files[j].name, line) == 0) {
@@ -185,48 +212,30 @@ int list(dfc config) {
 						}
 
 						if (fileIndex == -1) {
-							if (numFiles == listCapacity) {
-								listCapacity *= 2;
-								if ((files = realloc(files, listCapacity)) == NULL) {
+							// resize list if necessary
+							if (numFiles == *capacity) {
+								*capacity *= 2;
+								if ((files = realloc(files, *capacity)) == NULL) {
 									perror("Failed to reallocate list of files");
 								}
 							}
 
-							if (files != NULL && (files[numFiles].name = malloc(strlen(line) + 1)) == NULL) {
-								perror("Couldn't allocate room for new filename");
-							} else {
+							if (files != NULL && (files[numFiles].name = malloc(strlen(line) + 1)) != NULL) {
 								strcpy(files[numFiles].name, line);
 								bzero(files[numFiles].parts, 4);
 
 								files[numFiles++].parts[fileDesignation - 1] = 1;
 							}
 						}
-						designationPoint[0] = designationChar;
+						// de-null the ".n" in case it's needed for the strtok_r
+						dotPoint[0] = '.';
 					}
 				}
-				close(socket);
 			}
-		} else {
-			fprintf(stderr, "Failed to connect to DSF%d\n", i + 1);
-			perror("ERROR");
+			close(socket);
 		}
 	}
 
-	for (i = 0; i < numFiles; i++) {
-		anyMissing = 0;
-		printf("%s", files[i].name);
-		for (j = 0; j < 4 && anyMissing == 0; j++)
-			if (files[i].parts[j] == 0)
-				anyMissing = 1;
-
-		if (anyMissing == 1)
-			printf(" [incomplete]");
-		printf("\n");
-
-		free(files[i].name);
-	}
-
-	free(files);
 	free(query);
-	return 0;
+	return numFiles;
 }

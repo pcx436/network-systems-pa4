@@ -73,6 +73,7 @@ int initDFC(const char *fileName, dfc *config) {
 
 								if (error == 0) {
 									config->dfsSockets[whichServer] = (struct sockaddr_in *) results->ai_addr;
+									config->lengths[whichServer] = results->ai_addrlen;
 									seenServers[whichServer] = 1;
 									numServers++;
 									freeaddrinfo(results);

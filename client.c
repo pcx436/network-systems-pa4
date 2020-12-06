@@ -33,7 +33,7 @@ int main(int argc, const char *argv[]) {
 
 	do {
 
-	} while ();
+	} while (killed == 0);
 
 	return 0;
 }

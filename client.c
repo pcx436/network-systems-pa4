@@ -32,6 +32,7 @@ int main(int argc, const char *argv[]) {
 
 	while (killed == 0) {
 		printf("> ");
+		fgets(fullCommand, MAX_COMMAND, stdin);
 	}
 
 	return 0;

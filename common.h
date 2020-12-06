@@ -4,7 +4,14 @@
 
 #ifndef NETWORK_SYSTEMS_PA4_COMMON_H
 #define NETWORK_SYSTEMS_PA4_COMMON_H
+#include <stddef.h>
+
+typedef struct {
+	int parts[4];
+	char *name;
+} distributedFile;
 
 void trimSpace(char *s);
+unsigned mod_big(const unsigned char *num, size_t size, unsigned divisor);
 
 #endif //NETWORK_SYSTEMS_PA4_COMMON_H

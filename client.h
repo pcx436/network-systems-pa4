@@ -6,12 +6,10 @@
 #define NETWORK_SYSTEMS_PA4_CLIENT_H
 #include "macro.h"
 #include <sys/socket.h>
+#include <netdb.h>
 
 typedef struct {
-	struct sockaddr firstServerSocket;
-	struct sockaddr secondServerSocket;
-	struct sockaddr thirdServerSocket;
-	struct sockaddr fourthServerSocket;
+	struct sockaddr_in *dfsSockets[4];
 	char username[MAX_USERNAME];
 	char password[MAX_PASSWORD];
 } dfc;

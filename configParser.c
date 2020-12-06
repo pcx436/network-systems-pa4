@@ -152,5 +152,7 @@ int initDFC(const char *fileName, dfc *config) {
 }
 
 void destroyDFC(dfc *config) {
-
+	int i;
+	for (i = 0; i < 4; i++)
+		freeaddrinfo(config->serverInfo[i]);
 }

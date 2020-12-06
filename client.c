@@ -11,6 +11,7 @@ static volatile int killed = 0;
 int main(int argc, const char *argv[]) {
 	dfc config;
 	int numServers;
+	char command[MAX_COMMAND];
 
 	if (argc != 2) {
 		fprintf(stderr, "Incorrect number of arguments.\n");

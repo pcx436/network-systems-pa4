@@ -273,6 +273,7 @@ void *get(dfc config, const char *fileName) {
 		if ((socket = makeSocket(config.serverInfo[socketIndex])) >= 0) {
 			if (send(socket, query, queryLength, 0) != -1) {
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
+					// determine if currently receiving file info or at start of info block
 				}
 			}
 

@@ -135,13 +135,19 @@ int initDFC(const char *fileName, dfc *config) {
 	// error handling
 	if (numServers != 4)
 		for (i = 0; i < 4; i++)
-			if (seenServers[i] == 0)
+			if (seenServers[i] == 0) {
 				fprintf(stderr, "Missing designation for server #%d\n", i + 1);
+				numServers = -1;
+			}
 
-	if (strlen(config->username) == 0)
+	if (strlen(config->username) == 0) {
 		fprintf(stderr, "No username provided\n");
-	if (strlen(config->password) == 0)
+		numServers = -1;
+	}
+	if (strlen(config->password) == 0) {
 		fprintf(stderr, "No password provided\n");
+		numServers = -1;
+	}
 
 	return numServers;
 }

@@ -314,5 +314,7 @@ void *get(dfc config, const char *fileName) {
 		}
 	}
 
+	free(query);
+	free(partsOfSize);
 	return NULL;
 }

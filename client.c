@@ -248,7 +248,8 @@ void *get(dfc config, const char *fileName) {
 	int i, socket;
 	FILE *file;
 	char *query, *parts[4], responseBuffer[MAX_BUFFER];
-	size_t partSize[4], queryLength = strlen(config.username) + strlen(config.password);
+	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
+	size_t queryLength = strlen(config.username) + strlen(config.password);
 	queryLength += 4 + strlen(fileName);  // "get [fileName]"
 	queryLength += 2;  // newlines
 	queryLength += 1;  // null byte

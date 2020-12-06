@@ -15,7 +15,9 @@ int main(int argc, const char *argv[]) {
 		printf("Usage: %s [configuration file]", argv[0]);
 		return 1;
 	}
-	numServers = initDFC(argv[1], &config);
+	if ((numServers = initDFC(argv[1], &config)) != 4)
+		return 1;
+	
 
 	return 0;
 }

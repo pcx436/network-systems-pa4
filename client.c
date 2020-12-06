@@ -7,6 +7,7 @@
 #include "configParser.h"
 #include <stdio.h>
 #include <string.h>
+// TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
 	dfc config;

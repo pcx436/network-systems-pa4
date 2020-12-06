@@ -253,5 +253,11 @@ void *get(dfc config, const char *fileName) {
 	queryLength += 2;  // newlines
 	queryLength += 1;  // null byte
 
+	if ((query = malloc(queryLength)) == NULL)
+		return NULL;
+
+	// build query
+	sprintf(query, "%s\n%s\nget %s", config.username, config.password, fileName);
+
 	return NULL;
 }

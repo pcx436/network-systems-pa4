@@ -3,25 +3,17 @@
 //
 
 #include "client.h"
-#include <stdio.h>
-#include <netdb.h>
 
-/**
- * Initialize a DFC
- * @param fileName	Name of the configuration file.
- * @param config	Pointer to the config to build
- */
-void initDFC(const char *fileName, dfc *config) {
-	FILE *file;
-	char lineBuffer[MAX_LINE];
-	struct addrinfo hints, *results;
+int main(int argc, const char *argv[]) {
+	dfc config;
+	int numServers;
 
-	if ((file = fopen(fileName, "r")) == NULL)
-		return;
+	if (argc != 2) {
+		fprintf(stderr, "Incorrect number of arguments.\n");
+		printf("Usage: %s [configuration file]", argv[0]);
+		return 1;
+	}
+	numServers = initDFC(argv[1], &config);
 
-	fclose(file);
-}
-
-void destroyDFC(dfc *config) {
-
+	return 0;
 }

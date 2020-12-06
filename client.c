@@ -263,6 +263,7 @@ void *get(dfc config, const char *fileName) {
 	// init partSize and parts arrays
 	for (i = 0; i < 4; i++) {
 		partSize[i] = 0;
+		currentSize[i] = 0;
 		parts[i] = NULL;
 	}
 

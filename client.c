@@ -3,6 +3,8 @@
 //
 
 #include "client.h"
+#include "configParser.h"
+#include <stdio.h>
 
 int main(int argc, const char *argv[]) {
 	dfc config;

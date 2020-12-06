@@ -30,6 +30,8 @@ int main(int argc, const char *argv[]) {
 	while (exit == 0) {
 		printf("> ");
 		fgets(fullCommand, MAX_COMMAND, stdin);
+		trimSpace(fullCommand);
+
 		
 		// TODO: remove this once I have the command parsing in. It's only here to shut my editor up
 		exit = 1;

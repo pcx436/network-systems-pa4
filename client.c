@@ -274,6 +274,8 @@ void *get(dfc config, const char *fileName) {
 	for (socketIndex = 0; socketIndex < 4; socketIndex++) {
 		if ((socket = makeSocket(config.serverInfo[socketIndex])) >= 0) {
 			if (send(socket, query, queryLength, 0) != -1) {
+				// FIXME: adapt to malformed responses
+				// FIXME: currently assuming that when there is an info block, we can see the whole thing.
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
 					// set pointInResponse to start of buffer
 					pointInResponse = responseBuffer;

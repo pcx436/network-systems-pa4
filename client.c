@@ -114,7 +114,7 @@ int * pingServers(dfc config) {
 	for (i = 0; i < 4; i++) {
 		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
 
-			if (error == 0 && (ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) != -1) {
+			if ((ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) > 0) {
 				ioSize = recv(socket, response, 1024, 0);
 				if (strncmp("pong", response, 4) == 0)
 					online[i] = 1;

@@ -72,11 +72,9 @@ int initDFC(const char *fileName, dfc *config) {
 								error = getaddrinfo(option, portPointer, &hints, &results);
 
 								if (error == 0) {
-									config->dfsSockets[whichServer] = (struct sockaddr_in *) results->ai_addr;
-									config->lengths[whichServer] = results->ai_addrlen;
+									config->serverInfo[whichServer] = results;
 									seenServers[whichServer] = 1;
 									numServers++;
-									freeaddrinfo(results);
 								}
 								else {
 									fprintf(stderr, "Hostname resolution failure: %s\n", gai_strerror(error));

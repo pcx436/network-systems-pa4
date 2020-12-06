@@ -250,7 +250,7 @@ void *get(dfc config, const char *fileName) {
 	void *parts[4];
 	char *query, responseBuffer[MAX_BUFFER];
 	size_t partSize[4], currentSize[4];  // partSize = total # bytes of part, currentSize = bytes received so far
-	ssize_t bytesReceived;
+	ssize_t bytesReceived, toCopy, remainder;
 	size_t queryLength = strlen(config.username) + strlen(config.password);
 	queryLength += 4 + strlen(fileName);  // "get [fileName]"
 	queryLength += 2;  // newlines
@@ -285,6 +285,12 @@ void *get(dfc config, const char *fileName) {
 						// TODO: Handle new block case
 					} else {  // continuing receive of part from last loop iteration
 						// determine if current file takes up entire received buffer or only part
+						remainder = partSize[whichFile] - currentSize[whichFile];
+						if (bytesReceived <= remainder)
+							toCopy = bytesReceived;
+						else
+							toCopy = remainder;
+
 					}
 				}
 			}

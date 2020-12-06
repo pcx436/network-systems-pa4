@@ -11,7 +11,7 @@
 
 int main(int argc, const char *argv[]) {
 	dfc config;
-	int numServers;
+	char fullCommand[MAX_COMMAND], *tokenSave, *param;
 	char fullCommand[MAX_COMMAND], *tokenSave, *commandWord, *commandOption;
 	int exit = 0;
 
@@ -22,7 +22,7 @@ int main(int argc, const char *argv[]) {
 	}
 
 	// failure to load dfc.conf
-	if ((numServers = initDFC(argv[1], &config)) != 4)
+	if (initDFC(argv[1], &config) != 4)
 		return 1;
 
 	// display intro

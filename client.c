@@ -283,10 +283,8 @@ void *get(dfc config, const char *fileName) {
 							whichFile = sizeIndex;
 					}
 
-					// all parts seen so far have been totally received, time to read new block
-					if (whichFile == -1) {
-						// TODO: Handle new block case
-					} else {  // continuing receive of part from last loop iteration
+					// continuing receive of part from last loop iteration
+					if (whichFile != -1) {
 						// determine if current file takes up entire received buffer or only part
 						remainder = partSize[whichFile] - currentSize[whichFile];
 						if (bytesReceived <= remainder)

@@ -245,6 +245,13 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 void *get(dfc config, const char *fileName) {
 	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
 	// (no [] transmitted, used to show separation of parts)
+	int i, socket;
+	FILE *file;
+	char *query, *parts[4], responseBuffer[MAX_BUFFER];
+	size_t partSize[4], queryLength = strlen(config.username) + strlen(config.password);
+	queryLength += 4 + strlen(fileName);  // "get [fileName]"
+	queryLength += 2;  // newlines
+	queryLength += 1;  // null byte
 
 	return NULL;
 }

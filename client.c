@@ -3,6 +3,7 @@
 //
 
 #include "client.h"
+#include "common.h"
 #include "configParser.h"
 #include <stdio.h>
 #include <signal.h>
@@ -13,6 +14,7 @@ int main(int argc, const char *argv[]) {
 	dfc config;
 	int numServers;
 	char fullCommand[MAX_COMMAND], *tokenSave;
+	int exit = 0;
 
 	signal(SIGINT, sigintHandler);
 
@@ -30,9 +32,12 @@ int main(int argc, const char *argv[]) {
 	printf("Welcome to Jacob's Distributed File System Client!\n");
 	displayHelp();
 
-	while (killed == 0) {
+	while (exit == 0) {
 		printf("> ");
 		fgets(fullCommand, MAX_COMMAND, stdin);
+		
+		// TODO: remove this once I have the command parsing in. It's only here to shut my editor up
+		exit = 1;
 	}
 
 	return 0;

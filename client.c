@@ -371,7 +371,7 @@ void *get(dfc config, const char *fileName) {
 							memcpy(parts[partDesignation] + currentSize[partDesignation], pointInResponse, toCopy);
 							currentSize[partDesignation] += toCopy;
 
-							if (toCopy == remainder)
+							if (toCopy == remainder || bytesReceived == remainder)
 								partDesignation = -1;
 
 							// shift pointInResponse in reaction to copy

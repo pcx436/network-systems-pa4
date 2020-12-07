@@ -392,5 +392,9 @@ void *get(dfc config, const char *fileName) {
 		printf("File is incomplete.");
 	}
 
+	for (i = 0; i < 4; i++)
+		if (parts[i] != NULL)
+			free(parts);
+
 	return NULL;
 }

@@ -368,7 +368,7 @@ void *get(dfc config, const char *fileName) {
 								toCopy = remainder;
 
 							// "append" received bytes to the end of the part in question
-							memcpy(parts[partDesignation] + currentSize[partDesignation], responseBuffer, toCopy);
+							memcpy(parts[partDesignation] + currentSize[partDesignation], pointInResponse, toCopy);
 							currentSize[partDesignation] += toCopy;
 
 							if (toCopy == remainder)

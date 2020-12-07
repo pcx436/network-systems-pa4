@@ -283,15 +283,15 @@ void *get(dfc config, const char *fileName) {
 					// keep track of end pointer
 					end = responseBuffer + bytesReceived;
 
-					// still data left in buffer, begin parsing as new info block
+					// still data left in buffer
 					while (pointInResponse < end) {
-						// in case we've already seen this part, skip it
+						// have seen a part, have to skip it
 						if (skipCount > 0 && skipCount <= bytesReceived) {
 							pointInResponse += skipCount;
 							skipCount = 0;
 							partDesignation = -1;  // skipped finished
 						}
-						else if (skipCount > 0) {
+						else if (skipCount > 0) {  // skipCount exceeds buffer limits
 							skipCount -= bytesReceived;
 							pointInResponse += bytesReceived;
 						}
@@ -334,7 +334,7 @@ void *get(dfc config, const char *fileName) {
 									skipCount = parsedSize;
 								}
 							}
-							else {
+							else {  // have yet to see end of part size specification
 								strcat(partsOfSize, pointInResponse);
 								pointInResponse = end;
 							}

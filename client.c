@@ -385,7 +385,6 @@ void *get(dfc config, const char *fileName) {
 		}
 	}
 	free(query);
-	free(partsOfSize);
 
 	// If we have all four parts, assemble the file and write to working directory
 	for (i = 0; i < 4 && fileIsComplete == 1; i++)
@@ -410,7 +409,7 @@ void *get(dfc config, const char *fileName) {
 
 	for (i = 0; i < 4; i++)
 		if (parts[i] != NULL)
-			free(parts);
+			free(parts[i]);
 
 	return NULL;
 }

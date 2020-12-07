@@ -300,7 +300,7 @@ void *get(dfc config, const char *fileName) {
 						}
 						else if (skipCount > 0) {  // skipCount exceeds buffer limits
 							skipCount -= bytesReceived;
-							pointInResponse += bytesReceived;
+							pointInResponse = end;
 						}
 						else if ((partDesignation == -1 || partSize[partDesignation] == -1) && pointInResponse[0] == '\n') {
 							// skip newline

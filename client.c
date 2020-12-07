@@ -277,6 +277,12 @@ void *get(dfc config, const char *fileName) {
 				// FIXME: adapt to malformed responses
 				// FIXME: currently assuming that when there is an info block, we can see the whole thing.
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
+					// check for login failure
+					if (justStarted == 1 && strcmp(responseBuffer, invalidPasswordResponse) == 0)
+						break;
+					else
+						justStarted = 0;
+
 					// set pointInResponse to start of buffer
 					pointInResponse = responseBuffer;
 

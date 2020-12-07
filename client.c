@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <ctype.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
@@ -305,10 +306,15 @@ void *get(dfc config, const char *fileName) {
 							// skip newline
 							pointInResponse += 1;
 						}
-						else if (partDesignation == -1) {
-							partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
-							pointInResponse += 2;  // skip designation and newline
-							bytesReceived -= 2;
+						else if (partDesignation == -1) {  // current character is the buffer designation
+							if (isdigit(pointInResponse[0])) {
+								partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
+								pointInResponse += 2;  // skip designation and newline
+								bytesReceived -= 2;
+							}
+							else {
+								fprintf(stderr, "Invalid file part designation received.\n");
+							}
 						}
 						else if (partSize[partDesignation] == -1) {
 							// found the end of the part size

@@ -386,9 +386,12 @@ void *get(dfc config, const char *fileName) {
 			fileIsComplete = 0;
 
 	if (fileIsComplete) {
-		// TODO: assemble file
 		if ((file = fopen(fileName, "w")) != NULL) {
+			for (i = 0; i < 4; i++)
+				fwrite(parts[i], sizeof(char), partSize[i], file);
+			fclose(file);
 
+			printf("Successfully retrieved file \"%s\".\n", fileName);
 		}
 		else {
 			perror("Successfully retrieved all file parts, but failed to open file for writing");

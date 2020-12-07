@@ -14,6 +14,6 @@ typedef struct {
 void trimSpace(char *s);
 unsigned mod_big(const unsigned char *num, size_t size, unsigned divisor);
 
-const char *invalidPasswordResponse = "Invalid Username/Password. Please try again.";
+static const char *invalidPasswordResponse = "Invalid Username/Password. Please try again.";
 
 #endif //NETWORK_SYSTEMS_PA4_COMMON_H

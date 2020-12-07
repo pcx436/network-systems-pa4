@@ -16,7 +16,7 @@ int main(int argc, const char *argv[]) {
 	dfc config;
 	distributedFile *files;
 	size_t fileCapacity;
-	char fullCommand[MAX_COMMAND], *tokenSave, *param;
+	char fullCommand[MAX_COMMAND], *tokenSave, *param, *fileName;
 	int exit = 0, numFiles, anyMissing;
 	int i, j;
 
@@ -69,6 +69,13 @@ int main(int argc, const char *argv[]) {
 			}
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
+			if (strlen(fullCommand) > 4) {
+				fileName = fullCommand + 4;
+				get(config, fileName);
+			}
+			else {
+				fprintf(stderr, "Please specify a file to retrieve.\n");
+			}
 		} else if (strncmp("help", fullCommand, 4) == 0) {
 			displayHelp();
 		} else if (strncmp("exit", fullCommand, 4) == 0) {

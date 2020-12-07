@@ -387,6 +387,12 @@ void *get(dfc config, const char *fileName) {
 
 	if (fileIsComplete) {
 		// TODO: assemble file
+		if ((file = fopen(fileName, "w")) != NULL) {
+
+		}
+		else {
+			perror("Successfully retrieved all file parts, but failed to open file for writing");
+		}
 	}
 	else {
 		printf("File is incomplete.");

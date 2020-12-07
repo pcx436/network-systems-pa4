@@ -247,6 +247,7 @@ void *get(dfc config, const char *fileName) {
 	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
 	// (no [] transmitted, used to show separation of parts)
 	int i, socketIndex, partDesignation = -1, socket, justStarted = 1;
+	int fileIsComplete = 1;
 	FILE *file;
 	void *parts[4];
 	char *query, *pointInResponse, responseBuffer[MAX_BUFFER], *token, *end, partsOfSize[MAX_BUFFER];
@@ -375,10 +376,21 @@ void *get(dfc config, const char *fileName) {
 			}
 			close(socket);
 		}
-
 	}
-
 	free(query);
 	free(partsOfSize);
+
+	// If we have all four parts, assemble the file and write to working directory
+	for (i = 0; i < 4 && fileIsComplete == 1; i++)
+		if (parts[i] == NULL)
+			fileIsComplete = 0;
+
+	if (fileIsComplete) {
+		// TODO: assemble file
+	}
+	else {
+		printf("File is incomplete.");
+	}
+
 	return NULL;
 }

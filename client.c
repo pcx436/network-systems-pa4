@@ -245,7 +245,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 void *get(dfc config, const char *fileName) {
 	// response format "[Part\nNumBytes\nDATA][Part\nNumBytes\nDATA]"
 	// (no [] transmitted, used to show separation of parts)
-	int i, socketIndex, sizeIndex, whichFile, partDesignation = -1, socket;
+	int i, socketIndex, partDesignation = -1, socket, justStarted = 1;
 	FILE *file;
 	void *parts[4];
 	char *query, *pointInResponse, responseBuffer[MAX_BUFFER], *token, *end, partsOfSize[MAX_BUFFER];

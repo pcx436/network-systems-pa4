@@ -415,4 +415,8 @@ void *get(dfc config, const char *fileName) {
 }
 
 int put(dfc config, const char *fileName) {
+	if (fileName == NULL)
+		return -1;
+
+	return 0;
 }

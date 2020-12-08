@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <openssl/md5.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
@@ -417,6 +418,12 @@ void *get(dfc config, const char *fileName) {
 int put(dfc config, const char *fileName) {
 	if (fileName == NULL)
 		return -1;
+
+	unsigned char hash[MD5_DIGEST_LENGTH];
+	FILE *file;
+	char readBuffer[MAX_BUFFER];
+	MD5_CTX context;
+	size_t bytesRead;
 
 	return 0;
 }

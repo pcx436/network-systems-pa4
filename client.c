@@ -425,5 +425,12 @@ int put(dfc config, const char *fileName) {
 	MD5_CTX context;
 	size_t bytesRead;
 
+	if ((file = fopen(fileName, "r")) != NULL) {
+
+	}
+	else {
+		return -2;
+	}
+
 	return 0;
 }

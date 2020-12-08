@@ -424,9 +424,12 @@ int put(dfc config, const char *fileName) {
 	char readBuffer[MAX_BUFFER];
 	MD5_CTX context;
 	size_t bytesRead;
+	ssize_t fileSize;
 
 	if ((file = fopen(fileName, "r")) != NULL) {
-
+		fseek(file, 0, SEEK_END);
+		fileSize = ftell(file);
+		fseek(file, 0, SEEK_SET);
 	}
 	else {
 		return -2;

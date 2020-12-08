@@ -413,3 +413,6 @@ void *get(dfc config, const char *fileName) {
 
 	return NULL;
 }
+
+int put(dfc config, const char *fileName) {
+}

@@ -161,9 +161,47 @@ int parseDFS(const char *fileName, char **usernames, char **passwords, size_t ca
 	if (fileName == NULL || usernames == NULL || passwords == NULL || capacity <= 0 || strlen(fileName) == 0)
 		return -1;
 	FILE *file;
-	char *readBuffer[MAX_BUFFER], *token;
-	size_t numUsers = 0;
+	char *line, *token, *tabLocation;
+	size_t numUsers = 0, lineSize = MAX_LINE, nameSize, passwordSize;
 
+	if ((line = malloc(MAX_LINE)) == NULL)
+		return -2;
 
+	if ((file = fopen(fileName, "r")) != NULL) {
+		while (getline(&line, &lineSize, file) > 0) {
+			trimSpace(line);
+
+			// skip empty lines, comments, and lines without a tab in them
+			if (strlen(line) > 0 && line[0] != '#' && (tabLocation = strchr(line, '\t')) != NULL) {
+				tabLocation[0] = '\0';
+
+				nameSize = strlen(line);
+				// check name/password lengths
+				if (nameSize > MAX_USERNAME || nameSize == 0) {
+					fprintf(stderr, "Username \"%s\" size issue!\n", line);
+					break;
+				}
+
+				passwordSize = strlen(tabLocation + 1);
+				if (passwordSize > MAX_PASSWORD || passwordSize == 0) {
+					fprintf(stderr, "Password \"%s\" size issue!\n", tabLocation + 1);
+					break;
+				}
+
+				// malloc the strings
+				if ((usernames[numUsers] = malloc(nameSize + 1)) == NULL)
+					break;
+
+				if ((passwords[numUsers] = malloc(passwordSize + 1)) == NULL)
+					break;
+
+				strcpy(usernames[numUsers], line);
+				strcpy(passwords[numUsers++], tabLocation + 1);
+			}
+		}
+		fclose(file);
+	}
+
+	free(line);
 	return numUsers;
 }

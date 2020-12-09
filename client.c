@@ -429,10 +429,11 @@ int put(dfc config, const char *fileName) {
 
 	unsigned char hash[MD5_DIGEST_LENGTH];
 	FILE *file;
-	char readBuffer[MAX_BUFFER];
+	char readBuffer[MAX_BUFFER], *query;
 	MD5_CTX context;
-	size_t bytesRead;
-	ssize_t fileSize;
+	size_t bytesRead, querySize, leftToSend, currentRead;
+	ssize_t fileSize, partSize[4];
+	int i, j, socket, partsToSend[2], x, offset;
 
 	if ((file = fopen(fileName, "r")) != NULL) {
 		fseek(file, 0, SEEK_END);

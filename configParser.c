@@ -161,4 +161,5 @@ int parseDFS(const char *fileName, char **usernames, char **passwords, size_t ca
 	if (fileName == NULL || usernames == NULL || passwords == NULL || capacity <= 0 || strlen(fileName) == 0)
 		return -1;
 
+	return 0;
 }

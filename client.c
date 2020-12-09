@@ -490,6 +490,11 @@ int put(dfc config, const char *fileName) {
 
 							// send part header
 							if (send(socket, readBuffer, strlen(readBuffer), 0) != -1) {
+								for (leftToSend = partSize[partsToSend[j]]; leftToSend > 0; leftToSend -= bytesRead) {
+									currentRead = (leftToSend < MAX_BUFFER) ? leftToSend : MAX_BUFFER;
+									bytesRead = fread(readBuffer, sizeof(char), currentRead, file);
+									send(socket, readBuffer, bytesRead, 0);
+								}
 							}
 						}
 					}

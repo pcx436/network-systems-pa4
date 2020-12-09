@@ -9,6 +9,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif ()
 
 add_executable(dfc client.c client.h macro.h configParser.c configParser.h common.c common.h)
-add_executable(dfs server.c server.h macro.h common.c common.h)
+add_executable(dfs server.c server.h macro.h configParser.c configParser.h common.c common.h)
 target_link_libraries(dfc OpenSSL::SSL)
 target_link_libraries(dfs OpenSSL::SSL ${CMAKE_THREAD_LIBS_INIT})

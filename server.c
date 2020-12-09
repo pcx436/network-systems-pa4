@@ -31,6 +31,11 @@ int main(int argc, const char *argv[]) {
 	pthread_t *threadIDs;
 	size_t threadCapacity = LISTENQ;
 
+	if (mkdir(dir, 0700) == -1 && errno != EEXIST) {
+		perror("Failed directory creation");
+		return 1;
+	}
+
 	if ((threadIDs = malloc(threadCapacity)) == NULL) {
 		return 4;
 	}

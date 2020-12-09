@@ -130,3 +130,17 @@ int makeSocket(int port) {
 }
 
 void handler(int useless) { killed = 1; }
+
+void *connectionHandler(void *arguments) {
+	threadArgs *tArgs = arguments;
+	// TODO: things
+
+	close(tArgs->sockfd);
+
+	pthread_mutex_lock(tArgs->mutex);
+	tArgs->numThreads--;
+	pthread_mutex_unlock(tArgs->mutex);
+
+	free(tArgs);
+	return NULL;
+}

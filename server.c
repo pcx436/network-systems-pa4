@@ -138,12 +138,12 @@ void handler(int useless) { killed = 1; }
 void *connectionHandler(void *arguments) {
 	threadArgs *tArgs = arguments;
 	char buffer[MAX_BUFFER], *nameToken, *pwToken, *query, *savePoint;
-	int authorized = 0, i;
+	int checkedAuthorization = 0, authorized = 0, i;
 	size_t bytesReceived;
-	// TODO: things
 
-	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0) {
-		if (!authorized) {
+	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || authorized)) {
+		if (!checkedAuthorization) {
+			checkedAuthorization = 1;
 			nameToken = strtok_r(buffer, "\n", &savePoint);
 			pwToken = strtok_r(NULL, "\n", &savePoint);
 
@@ -153,6 +153,9 @@ void *connectionHandler(void *arguments) {
 						authorized = 1;
 				}
 			}
+
+			if (!authorized)
+				send(tArgs->sockfd, invalidPasswordResponse, strlen(invalidPasswordResponse), 0);
 		}
 	}
 

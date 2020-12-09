@@ -143,20 +143,39 @@ void *connectionHandler(void *arguments) {
 	size_t bytesReceived;
 
 	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || authorized)) {
-		if (!checkedAuthorization) {
-			checkedAuthorization = 1;
-			nameToken = strtok_r(buffer, "\n", &savePoint);
-			pwToken = strtok_r(NULL, "\n", &savePoint);
+		pointInRequest = buffer;
+		end = buffer + bytesReceived;
 
-			if (nameToken != NULL && pwToken != NULL) {
-				for (i = 0; i < tArgs->numUsers && !authorized; i++) {
-					if (strcmp(nameToken, tArgs->usernames[i]) == 0 && strcmp(pwToken, tArgs->passwords[i]) == 0)
-						authorized = 1;
+		while (pointInRequest < end) {
+			if (!checkedAuthorization) {
+				checkedAuthorization = 1;
+				nameToken = strtok_r(buffer, "\n", &savePoint);
+				pwToken = strtok_r(NULL, "\n", &savePoint);
+
+				if (nameToken != NULL && pwToken != NULL) {
+					for (i = 0; i < tArgs->numUsers && !authorized; i++) {
+						if (strcmp(nameToken, tArgs->usernames[i]) == 0 && strcmp(pwToken, tArgs->passwords[i]) == 0)
+							authorized = 1;
+					}
+				}
+				if (!authorized) {
+					send(tArgs->sockfd, invalidPasswordResponse, strlen(invalidPasswordResponse), 0);
+					pointInRequest = end;  // break inner loop
+				}
+				else {
+					pointInRequest = strtok_r(NULL, "\n", &savePoint);  // jump past password
+					send(tArgs->sockfd, authorizedResponse, strlen(authorizedResponse), 0);
 				}
 			}
-
-			if (!authorized)
-				send(tArgs->sockfd, invalidPasswordResponse, strlen(invalidPasswordResponse), 0);
+			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "list", 4) == 0) {
+				// list functionality called
+			}
+			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
+				// put functionality called
+			}
+			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "put ", 4) == 0) {
+				// get functionality called
+			}
 		}
 	}
 

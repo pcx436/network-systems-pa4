@@ -475,6 +475,16 @@ int put(dfc config, const char *fileName) {
 #ifdef DEBUG
 				printf("Copying parts %d and %d\n", partsToSend[0], partsToSend[1]);
 #endif
+				if (send(socket, query, querySize, 0) != -1) {
+					bzero(readBuffer, MAX_BUFFER);
+					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
+					// successful authorization, send the data
+					if (bytesRead > 0 && strcmp("AUTH", readBuffer) == 0) {
+					}
+				}
+				else {
+					perror("Send failure");
+				}
 				close(socket);
 			}
 			else {

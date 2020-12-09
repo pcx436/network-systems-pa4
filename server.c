@@ -25,7 +25,13 @@ int main(int argc, const char *argv[]) {
 
 	char *usernames[MAX_USERS], *passwords[MAX_USERS];
 	const char *dir = argv[1];
-	pthread_t threadIDs[LISTENQ];
+	pthread_t *threadIDs;
+	size_t threadCapacity = LISTENQ;
+
+	if ((threadIDs = malloc(threadCapacity)) == NULL) {
+		return 4;
+	}
+
 	pthread_mutex_t threadMutex;
 	int numThreads = 0, i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
 	int connnectionfd;
@@ -33,8 +39,15 @@ int main(int argc, const char *argv[]) {
 	socklen_t socketSize;
 	struct sockaddr_in clientAddr;
 
-	if (numUsers < 0)
+	if (numUsers < 0) {
+		free(threadIDs);
+		// free users
+		for (i = 0; i < numUsers; i++) {
+			free(usernames[i]);
+			free(passwords[i]);
+		}
 		return 2;
+	}
 
 	pthread_mutex_init(&threadMutex, NULL);
 
@@ -54,6 +67,8 @@ int main(int argc, const char *argv[]) {
 	}
 	pthread_mutex_destroy(&threadMutex);
 	close(sockfd);
+
+	free(threadIDs);
 	return 0;
 }
 

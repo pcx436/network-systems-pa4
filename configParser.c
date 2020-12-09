@@ -157,6 +157,6 @@ void destroyDFC(dfc *config) {
 		freeaddrinfo(config->serverInfo[i]);
 }
 
-int parseDFS(const char *fileName, char *usernames, char *passwords) {
+int parseDFS(const char *fileName, char **usernames, char **passwords, size_t capacity) {
 	return NULL;
 }

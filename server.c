@@ -3,6 +3,7 @@
 //
 
 #include "server.h"
+#include "common.h"
 #include "configParser.h"
 #include <stdio.h>
 #include <stdlib.h>

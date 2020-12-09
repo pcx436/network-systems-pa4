@@ -181,6 +181,9 @@ void *connectionHandler(void *arguments) {
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
 				// get functionality called
+				printf("Get called with file %s\n", pointInRequest + 4);
+				receiveGet(*tArgs, userIndex, pointInRequest + 4);
+				pointInRequest = end;
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "put ", 4) == 0) {
 				// put functionality called

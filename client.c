@@ -69,6 +69,14 @@ int main(int argc, const char *argv[]) {
 				free(files);
 			}
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
+			if (strlen(fullCommand) > 4) {
+				fileName = fullCommand + 4;
+				trimSpace(fileName);
+				put(config, fileName);
+			}
+			else {
+				fprintf(stderr, "Please specify a file to retrieve.\n");
+			}
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
 			if (strlen(fullCommand) > 4) {
 				fileName = fullCommand + 4;

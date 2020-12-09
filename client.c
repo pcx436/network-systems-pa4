@@ -366,7 +366,11 @@ void *get(dfc config, const char *fileName) {
 								pointInResponse = end;
 							}
 						}
-						else {  // partDesignation != -1, partSize[partDesignation] != -1, not skipping
+						else if (partSize[partDesignation] == currentSize[partDesignation]) {
+							skipCount = partSize[partDesignation];
+							pointInResponse = strchr(pointInResponse, '\n') + 1;  // skip past chunk size
+						}
+						else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping
 							// determine if current file takes up entire received buffer or only part
 							remainder = partSize[partDesignation] - currentSize[partDesignation];
 							if (bytesReceived <= remainder)

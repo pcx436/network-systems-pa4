@@ -208,8 +208,10 @@ int list(threadArgs tArgs, int userIndex) {
 	bzero(fileName, PATH_MAX);
 	sprintf(fileName, "%s/%s", tArgs.dir, tArgs.usernames[userIndex]);
 
-	if (stat(fileName, &st) == -1) {
-		mkdir(fileName, 700);
+	if (stat(fileName, &st) == -1 && mkdir(fileName, 700) == -1) {
+		perror("Failed to create user directory");
+		return -1;
+	}
 	}
 	else {
 		// found directory, list any files

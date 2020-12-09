@@ -137,8 +137,9 @@ void handler(int useless) { killed = 1; }
 
 void *connectionHandler(void *arguments) {
 	threadArgs *tArgs = arguments;
-	char buffer[MAX_BUFFER], *nameToken, *pwToken, *query, *savePoint;
-	int checkedAuthorization = 0, authorized = 0, i;
+	char buffer[MAX_BUFFER], *nameToken, *pwToken, *pointInRequest, *savePoint, *end;
+	char *fileName = NULL;
+	int checkedAuthorization = 0, authorized = 0, i, partDesignation = -1;
 	size_t bytesReceived;
 
 	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || authorized)) {

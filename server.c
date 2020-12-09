@@ -25,7 +25,14 @@ int main(int argc, const char *argv[]) {
 
 	char *usernames[MAX_USERS], *passwords[MAX_USERS];
 	const char *dir = argv[1];
-	int i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
+	pthread_t threadIDs[LISTENQ];
+	pthread_mutex_t threadMutex;
+	int numThreads = 0, i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
+	int connnectionfd;
+
+	socklen_t socketSize;
+	struct sockaddr_in clientAddr;
+
 	if (numUsers < 0)
 		return 2;
 

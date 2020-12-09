@@ -325,7 +325,7 @@ void *get(dfc config, const char *fileName) {
 						}
 						else if (partDesignation == -1) {  // current character is the buffer designation
 							if (isdigit(pointInResponse[0])) {
-								partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
+								partDesignation = (int)strtol(pointInResponse, NULL, 10);
 								pointInResponse += 2;  // skip designation and newline
 								bytesReceived -= 2;
 							}

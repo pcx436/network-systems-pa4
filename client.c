@@ -457,6 +457,8 @@ int put(dfc config, const char *fileName) {
 		// get file size, return to beginning
 		fileSize = ftell(file);
 		fseek(file, 0, SEEK_SET);
+
+		offset = (int)mod_big(hash, MD5_DIGEST_LENGTH, 4);
 	}
 	else {
 		return -2;

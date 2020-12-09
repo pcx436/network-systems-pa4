@@ -35,6 +35,7 @@ int main(int argc, const char *argv[]) {
 	pthread_mutex_t threadMutex;
 	int numThreads = 0, i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
 	int connnectionfd;
+	threadArgs *tArgs;
 
 	socklen_t socketSize;
 	struct sockaddr_in clientAddr;
@@ -55,7 +56,22 @@ int main(int argc, const char *argv[]) {
 	if ((sockfd = makeSocket(port)) >= 0) {
 		// loop until SIGINT
 		while (!killed) {
+			if ((connnectionfd = accept(sockfd, (struct sockaddr *)&clientAddr, &socketSize)) > 0) {
+				tArgs = malloc(sizeof(threadArgs));
+				tArgs->sockfd = connnectionfd;
+				tArgs->numThreads = &numThreads;
+				tArgs->dir = dir;
+				tArgs->mutex = &threadMutex;
 
+				pthread_mutex_lock(&threadMutex);
+				if (numThreads == threadCapacity) {
+					threadCapacity *= 2;
+					threadIDs = realloc(threadIDs, threadCapacity);
+				}
+
+				pthread_create(&threadIDs[numThreads++], NULL, connectionHandler, tArgs);
+				pthread_mutex_unlock(&threadMutex);
+			}
 		}
 
 	}

@@ -160,6 +160,10 @@ void destroyDFC(dfc *config) {
 int parseDFS(const char *fileName, char **usernames, char **passwords, size_t capacity) {
 	if (fileName == NULL || usernames == NULL || passwords == NULL || capacity <= 0 || strlen(fileName) == 0)
 		return -1;
+	FILE *file;
+	char *readBuffer[MAX_BUFFER], *token;
+	size_t numUsers = 0;
 
-	return 0;
+
+	return numUsers;
 }

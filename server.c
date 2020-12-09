@@ -243,5 +243,9 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 	int  i;
 	size_t bytesRead;
 
+	// init foundParts
+	for(i = 0; i < 4; i++) {
+	}
+
 	return 0;
 }

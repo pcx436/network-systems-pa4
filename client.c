@@ -481,6 +481,10 @@ int put(dfc config, const char *fileName) {
 					// successful authorization, send the data
 					if (bytesRead > 0 && strcmp("AUTH", readBuffer) == 0) {
 						for (j = 0; j < 2; j++) {
+							// build part header
+							bzero(readBuffer, MAX_BUFFER);
+							sprintf(readBuffer, "%d\n%zd\n", partsToSend[j], partSize[partsToSend[j]]);
+
 						}
 					}
 				}

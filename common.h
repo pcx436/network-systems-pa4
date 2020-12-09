@@ -15,5 +15,6 @@ void trimSpace(char *s);
 unsigned mod_big(const unsigned char *num, size_t size, unsigned divisor);
 
 static const char *invalidPasswordResponse = "Invalid Username/Password. Please try again.";
+static const char *queryFailure = "Invalid query.";
 
 #endif //NETWORK_SYSTEMS_PA4_COMMON_H

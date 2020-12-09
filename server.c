@@ -212,6 +212,11 @@ int list(threadArgs tArgs, int userIndex) {
 		perror("Failed to create user directory");
 		return -1;
 	}
+	else if ((dirptr = opendir(fileName)) != NULL) {  // succeeded in opening directory
+		while ((ent = readdir(dirptr)) != NULL) {
+			send(tArgs.sockfd, ent->d_name, strlen(ent->d_name), 0);
+		}
+		closedir(dirptr);
 	}
 	else {
 		// found directory, list any files

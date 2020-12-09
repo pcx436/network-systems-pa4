@@ -176,7 +176,7 @@ void *connectionHandler(void *arguments) {
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "list", 4) == 0) {
 				// list functionality called
-				list(*tArgs);
+				list(*tArgs, userIndex);
 				pointInRequest = end;
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
@@ -198,7 +198,7 @@ void *connectionHandler(void *arguments) {
 	return NULL;
 }
 
-int list(threadArgs tArgs) {
+int list(threadArgs tArgs, int userIndex) {
 	DIR *dirptr;
 	char fileName[PATH_MAX];
 	struct dirent *ent;

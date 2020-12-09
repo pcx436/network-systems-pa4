@@ -466,6 +466,12 @@ int put(dfc config, const char *fileName) {
 
 		// open socket loop time
 		for (i = 0; i < 4; i++) {
+			x = (i - offset) % 4;
+
+			partsToSend[0] = x;
+			partsToSend[1] = (x != 3) ? x + 1 : 0;
+
+		}
 
 		fclose(file);
 	}

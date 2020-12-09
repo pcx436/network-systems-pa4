@@ -228,5 +228,11 @@ int list(threadArgs tArgs, int userIndex) {
 	return 0;
 }
 
+/**
+ * receive GET command from the client
+ * @param tArgs
+ * @param userIndex
+ * @return
+ */
 int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 }

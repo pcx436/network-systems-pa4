@@ -68,6 +68,9 @@ int main(int argc, const char *argv[]) {
 	pthread_mutex_destroy(&threadMutex);
 	close(sockfd);
 
+	for (i = 0; i < numThreads; i++)
+		pthread_join(threadIDs[i], NULL);
+
 	free(threadIDs);
 	return 0;
 }

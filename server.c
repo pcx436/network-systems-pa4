@@ -188,3 +188,7 @@ void *connectionHandler(void *arguments) {
 	free(tArgs);
 	return NULL;
 }
+
+int list(threadArgs tArgs) {
+	return 0;
+}

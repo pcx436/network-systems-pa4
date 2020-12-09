@@ -480,6 +480,8 @@ int put(dfc config, const char *fileName) {
 					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
 					// successful authorization, send the data
 					if (bytesRead > 0 && strcmp("AUTH", readBuffer) == 0) {
+						for (j = 0; j < 2; j++) {
+						}
 					}
 				}
 				else {

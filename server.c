@@ -243,7 +243,7 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 
 	char nameBuff[PATH_MAX], buffer[MAX_BUFFER];
 	FILE *file;
-	int  i;
+	int i, returnValue = 0;
 	size_t bytesRead;
 
 	// init foundParts
@@ -258,17 +258,23 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 			fseek(file, 0, SEEK_SET);
 
 			send(tArgs.sockfd, buffer, strlen(buffer), 0);
-			while ((bytesRead = fread(buffer, sizeof(char), MAX_BUFFER, file)) > 0) {
+			while ((bytesRead = fread(buffer, sizeof(char), MAX_BUFFER, file)) > 0 && returnValue == 0) {
 				if (send(tArgs.sockfd, buffer, bytesRead, 0) == -1) {
-					perror("Send error");
+					bzero(buffer, MAX_BUFFER);
+					sprintf(buffer, "Error sending chunk data for %s", nameBuff);
+					perror(buffer);
+					returnValue = -2;
 				}
 			}
 			fclose(file);
 		}
 		else {
-			fprintf(stderr, "Failed to open file %s\n", nameBuff);
+			bzero(buffer, MAX_BUFFER);
+			sprintf(buffer, "Failed to open file %s", nameBuff);
+			perror(buffer);
+			returnValue = -1;
 		}
 	}
 
-	return 0;
+	return returnValue;
 }

@@ -23,7 +23,7 @@ void *connectionHandler(void *arguments);
 int makeSocket(int port);
 void handler(int useless);
 int list(threadArgs tArgs, int userIndex);
-int receivePut(threadArgs tArgs, int userIndex);
+int receiveGet(threadArgs tArgs, int userIndex, char *fileName);
 
 static volatile int killed = 0;
 #endif //NETWORK_SYSTEMS_PA4_SERVER_H

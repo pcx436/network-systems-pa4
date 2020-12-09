@@ -227,3 +227,6 @@ int list(threadArgs tArgs, int userIndex) {
 	}
 	return 0;
 }
+
+int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
+}

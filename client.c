@@ -350,19 +350,15 @@ void *get(dfc config, const char *fileName) {
 								pointInResponse = token + 1;
 
 								// new part
-								if (partSize[partDesignation] == -1) {
-									skipCount = 0;
-									partSize[partDesignation] = parsedSize;
+								skipCount = 0;
+								partSize[partDesignation] = parsedSize;
 
-									// if there is a higher power, I beg of them to never let this condition be true
-									if ((parts[partDesignation] = malloc(parsedSize)) == NULL) {
-										perror("Failed allocating space for file part");
-										partSize[partDesignation] = -1;
-										partDesignation = -1;
-										pointInResponse = end;
-									}
-								} else {  // seen part, skip it
-									skipCount = parsedSize;
+								// if there is a higher power, I beg of them to never let this condition be true
+								if ((parts[partDesignation] = malloc(parsedSize)) == NULL) {
+									perror("Failed allocating space for file part");
+									partSize[partDesignation] = 0;
+									partDesignation = -1;
+									pointInResponse = end;
 								}
 							}
 							else {  // have yet to see end of part size specification

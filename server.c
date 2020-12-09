@@ -146,10 +146,10 @@ void *connectionHandler(void *arguments) {
 	threadArgs *tArgs = arguments;
 	char buffer[MAX_BUFFER], *nameToken, *pwToken, *pointInRequest, *savePoint, *end;
 	char *fileName = NULL;
-	int checkedAuthorization = 0, authorized = 0, i, partDesignation = -1;
+	int checkedAuthorization = 0, userIndex = -1, i, partDesignation = -1;
 	size_t bytesReceived;
 
-	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || authorized)) {
+	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || userIndex != -1)) {
 		pointInRequest = buffer;
 		end = buffer + bytesReceived;
 
@@ -160,12 +160,12 @@ void *connectionHandler(void *arguments) {
 				pwToken = strtok_r(NULL, "\n", &savePoint);
 
 				if (nameToken != NULL && pwToken != NULL) {
-					for (i = 0; i < tArgs->numUsers && !authorized; i++) {
+					for (i = 0; i < tArgs->numUsers && userIndex == -1; i++) {
 						if (strcmp(nameToken, tArgs->usernames[i]) == 0 && strcmp(pwToken, tArgs->passwords[i]) == 0)
-							authorized = 1;
+							userIndex = i;
 					}
 				}
-				if (!authorized) {
+				if (!userIndex) {
 					send(tArgs->sockfd, invalidPasswordResponse, strlen(invalidPasswordResponse), 0);
 					pointInRequest = end;  // break inner loop
 				}

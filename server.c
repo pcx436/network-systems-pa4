@@ -3,6 +3,7 @@
 //
 
 #include "server.h"
+#include "configParser.h"
 #include <stdio.h>
 
 int main(int argc, const char *argv[]) {
@@ -13,6 +14,12 @@ int main(int argc, const char *argv[]) {
 		printf("Usage: %s [DIRECTORY] [PORT]\n", argv[0]);
 		return 1;
 	}
+
+	char *usernames[MAX_USERS], *passwords[MAX_USERS];
+	const char *dir = argv[1];
+	int i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
+	if (numUsers < 0)
+		return 2;
 
 	return 0;
 }

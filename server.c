@@ -145,15 +145,15 @@ void handler(int useless) { killed = 1; }
 
 void *connectionHandler(void *arguments) {
 	threadArgs *tArgs = arguments;
-	char buffer[MAX_BUFFER], *nameToken, *pwToken, *pointInRequest, *savePoint, *end;
-	char *fileName = NULL;
-	int checkedAuthorization = 0, userIndex = -1, i, partDesignation = -1;
+	char buffer[MAX_BUFFER], *nameToken, *pwToken, *pointInRequest, *savePoint, *end, *endlToken;
+	int checkedAuthorization = 0, userIndex = -1, i, partDesignation = -1, fullName = 0;
 	size_t bytesReceived;
 
 	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0 && (!checkedAuthorization || userIndex != -1)) {
 		pointInRequest = buffer;
 		end = buffer + bytesReceived;
 
+		// FIXME: what if it takes multiple buffer recvs to get the whole command
 		while (pointInRequest < end) {
 			if (!checkedAuthorization) {
 				checkedAuthorization = 1;
@@ -174,19 +174,34 @@ void *connectionHandler(void *arguments) {
 					pointInRequest = strtok_r(NULL, "\n", &savePoint);  // jump past password
 				}
 			}
-			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "list", 4) == 0) {
+			else if (strncmp(pointInRequest, "list", 4) == 0) {
 				// list functionality called
 				list(*tArgs, userIndex);
 				pointInRequest = end;
 			}
-			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
+			else if (strncmp(pointInRequest, "get ", 4) == 0) {
 				// get functionality called
 				printf("Get called with file %s\n", pointInRequest + 4);
 				receiveGet(*tArgs, userIndex, pointInRequest + 4);
 				pointInRequest = end;
 			}
-			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "put ", 4) == 0) {
+			else if (strncmp(pointInRequest, "put ", 4) == 0) {  // b
 				// put functionality called
+				pointInRequest += 4;
+				bytesReceived -= 4;
+				if ((endlToken = strchr(pointInRequest, '\n')) != NULL) {
+					endlToken[0] = '\0';
+					printf("Put called with file %s\n", pointInRequest);
+
+					pointInRequest = endlToken + 1;
+				}
+				else {
+					perror("No file with put?");
+					pointInRequest = end;
+				}
+			}
+			else {
+				// TODO: What was the response supposed to be?
 			}
 		}
 	}

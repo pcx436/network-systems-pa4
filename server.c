@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -197,5 +198,11 @@ int list(threadArgs tArgs) {
 	struct stat st = {0};
 
 	bzero(fileName, PATH_MAX);
+	if (stat(tArgs.dir, &st) == -1) {
+		mkdir(tArgs.dir, 700);
+	}
+	else {
+		// found directory, list any files
+	}
 	return 0;
 }

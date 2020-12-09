@@ -138,7 +138,7 @@ int makeSocket(int port) {
 		return -1;
 	}
 
-	return 0;
+	return sockfd;
 }
 
 void handler(int useless) { killed = 1; }

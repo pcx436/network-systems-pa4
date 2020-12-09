@@ -143,6 +143,15 @@ void *connectionHandler(void *arguments) {
 
 	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0) {
 		if (!authorized) {
+			nameToken = strtok_r(buffer, "\n", &savePoint);
+			pwToken = strtok_r(NULL, "\n", &savePoint);
+
+			if (nameToken != NULL && pwToken != NULL) {
+				for (i = 0; i < tArgs->numUsers && !authorized; i++) {
+					if (strcmp(nameToken, tArgs->usernames[i]) == 0 && strcmp(pwToken, tArgs->passwords[i]) == 0)
+						authorized = 1;
+				}
+			}
 		}
 	}
 

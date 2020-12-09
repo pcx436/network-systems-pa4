@@ -142,6 +142,8 @@ void *connectionHandler(void *arguments) {
 	// TODO: things
 
 	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0) {
+		if (!authorized) {
+		}
 	}
 
 	close(tArgs->sockfd);

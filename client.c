@@ -285,7 +285,7 @@ void *get(dfc config, const char *fileName) {
 
 	// init partSize and parts arrays
 	for (i = 0; i < 4; i++) {
-		partSize[i] = -1;
+		partSize[i] = 0;
 		currentSize[i] = 0;
 		parts[i] = NULL;
 	}
@@ -321,7 +321,7 @@ void *get(dfc config, const char *fileName) {
 							skipCount -= bytesReceived;
 							pointInResponse = end;
 						}
-						else if ((partDesignation == -1 || partSize[partDesignation] == -1) && pointInResponse[0] == '\n') {
+						else if ((partDesignation == -1 || partSize[partDesignation] == 0) && pointInResponse[0] == '\n') {
 							// skip newline
 							pointInResponse += 1;
 						}
@@ -335,7 +335,7 @@ void *get(dfc config, const char *fileName) {
 								fprintf(stderr, "Invalid file part designation received.\n");
 							}
 						}
-						else if (partSize[partDesignation] == -1) {
+						else if (partSize[partDesignation] == 0) {
 							// found the end of the part size
 							if ((token = strchr(pointInResponse, '\n')) != NULL) {
 								token[0] = '\0';

@@ -434,6 +434,19 @@ int put(dfc config, const char *fileName) {
 	size_t bytesRead, querySize, leftToSend, currentRead;
 	ssize_t fileSize, partSize[4];
 	int i, j, socket, partsToSend[2], x, offset;
+	/*
+	 * USERNAME\n
+	 * PASSWORD\n
+	 * put FILE\0
+	 */
+	querySize = strlen(config.username) + strlen(config.password) + strlen(fileName) + 7;
+
+	if ((query = malloc(querySize)) == NULL)
+		return -2;
+	sprintf(query, "%s\n%s\nput %s", config.username, config.password, fileName);
+
+	MD5_Init(&context);
+
 
 	if ((file = fopen(fileName, "r")) != NULL) {
 		fseek(file, 0, SEEK_END);

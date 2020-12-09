@@ -249,6 +249,17 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 		sprintf(nameBuff, "%s/%s/%s.%d", tArgs.dir, tArgs.usernames[userIndex], fileName, i);
 
 		if ((file = fopen(nameBuff, "r")) != NULL) {
+			fseek(file, 0, SEEK_END);
+			bzero(buffer, MAX_BUFFER);
+			sprintf(buffer, "%d\n%ld\n", i, ftell(file));
+			fseek(file, 0, SEEK_SET);
+
+			send(tArgs.sockfd, buffer, strlen(buffer), 0);
+			while ((bytesRead = fread(buffer, sizeof(char), MAX_BUFFER, file)) > 0) {
+				if (send(tArgs.sockfd, buffer, bytesRead, 0) == -1) {
+					perror("Send error");
+				}
+			}
 			fclose(file);
 		}
 		else {

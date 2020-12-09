@@ -471,6 +471,12 @@ int put(dfc config, const char *fileName) {
 			partsToSend[0] = x;
 			partsToSend[1] = (x != 3) ? x + 1 : 0;
 
+			if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
+				close(socket);
+			}
+			else {
+				perror("Socket failure");
+			}
 		}
 
 		fclose(file);

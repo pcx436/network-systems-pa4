@@ -512,7 +512,7 @@ int put(dfc config, const char *fileName) {
 		fclose(file);
 	}
 	else {
-		return -2;
+		return -3;
 	}
 
 	free(query);

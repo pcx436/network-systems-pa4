@@ -462,5 +462,6 @@ int put(dfc config, const char *fileName) {
 		return -2;
 	}
 
+	free(query);
 	return 0;
 }

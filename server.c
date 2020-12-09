@@ -180,10 +180,10 @@ void *connectionHandler(void *arguments) {
 				pointInRequest = end;
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
-				// put functionality called
+				// get functionality called
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "put ", 4) == 0) {
-				// get functionality called
+				// put functionality called
 			}
 		}
 	}

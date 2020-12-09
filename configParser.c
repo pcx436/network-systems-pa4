@@ -156,3 +156,7 @@ void destroyDFC(dfc *config) {
 	for (i = 0; i < 4; i++)
 		freeaddrinfo(config->serverInfo[i]);
 }
+
+char **parseDFS(const char *fileName) {
+	return NULL;
+}

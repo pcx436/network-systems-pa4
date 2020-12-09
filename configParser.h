@@ -18,4 +18,6 @@ typedef struct {
 int initDFC(const char *fileName, dfc *config);
 
 void destroyDFC(dfc *config);
+
+char **parseDFS(const char *fileName);
 #endif //NETWORK_SYSTEMS_PA4_CONFIGPARSER_H

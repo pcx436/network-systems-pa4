@@ -219,7 +219,7 @@ int list(threadArgs tArgs, int userIndex) {
 		closedir(dirptr);
 	}
 	else {
-		// found directory, list any files
+		perror("List failure");
 	}
 	return 0;
 }

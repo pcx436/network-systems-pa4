@@ -5,6 +5,14 @@
 #include "server.h"
 #include "configParser.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <string.h>
+#include <fcntl.h>
+#include <signal.h>
 
 int main(int argc, const char *argv[]) {
 	signal(SIGINT, handler);
@@ -20,6 +28,42 @@ int main(int argc, const char *argv[]) {
 	int i, numUsers = parseDFS("./dfs.conf", usernames, passwords, MAX_USERS), port, sockfd;
 	if (numUsers < 0)
 		return 2;
+
+
+int makeSocket(int port) {
+	int sockfd, opt = 1, flags;
+	struct sockaddr_in addr;
+
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+		return -1;
+
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const void *)&opt, sizeof(int)) < 0) {
+		close(sockfd);
+		return -1;
+	}
+
+	bzero(&addr, sizeof(struct sockaddr_in));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	addr.sin_port = htons((unsigned short) port);
+
+	if (bind(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+		close(sockfd);
+		return -1;
+	}
+	if ((flags = fcntl(sockfd, F_GETFL, 0)) < 0) {
+		close(sockfd);
+		return -1;
+	}
+	if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) < 0) {
+		close(sockfd);
+		return -1;
+	}
+
+	if (listen(sockfd, LISTENQ) < 0) {
+		close(sockfd);
+		return -1;
+	}
 
 	return 0;
 }

@@ -71,8 +71,8 @@ int main(int argc, const char *argv[]) {
 				tArgs->numThreads = &numThreads;
 				tArgs->dir = dir;
 				tArgs->mutex = &threadMutex;
-				tArgs->usernames;
-				tArgs->passwords;
+				tArgs->usernames = usernames;
+				tArgs->passwords = passwords;
 				tArgs->numUsers = numUsers;
 
 				pthread_mutex_lock(&threadMutex);

@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <signal.h>
 
 int main(int argc, const char *argv[]) {
@@ -190,5 +191,11 @@ void *connectionHandler(void *arguments) {
 }
 
 int list(threadArgs tArgs) {
+	DIR *dirptr;
+	char fileName[PATH_MAX];
+	struct dirent *ent;
+	struct stat st = {0};
+
+	bzero(fileName, PATH_MAX);
 	return 0;
 }

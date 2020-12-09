@@ -16,6 +16,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <signal.h>
+#include <errno.h>
 
 int main(int argc, const char *argv[]) {
 	signal(SIGINT, handler);

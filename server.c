@@ -235,4 +235,13 @@ int list(threadArgs tArgs, int userIndex) {
  * @return
  */
 int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
+	if (fileName == NULL)
+		return -1;
+
+	char nameBuff[PATH_MAX], buffer[MAX_BUFFER];
+	FILE *file;
+	int  i;
+	size_t bytesRead;
+
+	return 0;
 }

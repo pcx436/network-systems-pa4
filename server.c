@@ -136,6 +136,9 @@ void handler(int useless) { killed = 1; }
 
 void *connectionHandler(void *arguments) {
 	threadArgs *tArgs = arguments;
+	char buffer[MAX_BUFFER], *nameToken, *pwToken, *query, *savePoint;
+	int authorized = 0, i;
+	size_t bytesReceived;
 	// TODO: things
 
 	close(tArgs->sockfd);

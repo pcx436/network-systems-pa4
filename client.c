@@ -449,7 +449,12 @@ int put(dfc config, const char *fileName) {
 
 
 	if ((file = fopen(fileName, "r")) != NULL) {
-		fseek(file, 0, SEEK_END);
+		// hash file
+		while ((bytesRead = fread(readBuffer, sizeof(char), MAX_BUFFER, file)) != 0)
+			MD5_Update(&context, readBuffer, bytesRead);
+		MD5_Final(hash, &context);
+
+		// get file size, return to beginning
 		fileSize = ftell(file);
 		fseek(file, 0, SEEK_SET);
 	}

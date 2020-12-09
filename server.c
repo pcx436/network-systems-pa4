@@ -245,6 +245,15 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 
 	// init foundParts
 	for(i = 0; i < 4; i++) {
+		bzero(nameBuff, PATH_MAX);
+		sprintf(nameBuff, "%s/%s/%s.%d", tArgs.dir, tArgs.usernames[userIndex], fileName, i);
+
+		if ((file = fopen(nameBuff, "r")) != NULL) {
+			fclose(file);
+		}
+		else {
+			fprintf(stderr, "Failed to open file %s\n", nameBuff);
+		}
 	}
 
 	return 0;

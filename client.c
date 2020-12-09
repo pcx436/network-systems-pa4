@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <openssl/md5.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
@@ -68,6 +69,14 @@ int main(int argc, const char *argv[]) {
 				free(files);
 			}
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
+			if (strlen(fullCommand) > 4) {
+				fileName = fullCommand + 4;
+				trimSpace(fileName);
+				put(config, fileName);
+			}
+			else {
+				fprintf(stderr, "Please specify a file to retrieve.\n");
+			}
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
 			if (strlen(fullCommand) > 4) {
 				fileName = fullCommand + 4;
@@ -316,7 +325,7 @@ void *get(dfc config, const char *fileName) {
 						}
 						else if (partDesignation == -1) {  // current character is the buffer designation
 							if (isdigit(pointInResponse[0])) {
-								partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
+								partDesignation = (int)strtol(pointInResponse, NULL, 10);
 								pointInResponse += 2;  // skip designation and newline
 								bytesReceived -= 2;
 							}
@@ -412,4 +421,100 @@ void *get(dfc config, const char *fileName) {
 			free(parts[i]);
 
 	return NULL;
+}
+
+int put(dfc config, const char *fileName) {
+	if (fileName == NULL)
+		return -1;
+
+	unsigned char hash[MD5_DIGEST_LENGTH];
+	FILE *file;
+	char readBuffer[MAX_BUFFER], *query;
+	MD5_CTX context;
+	size_t bytesRead, querySize, leftToSend, currentRead;
+	ssize_t fileSize, partSize[4];
+	int i, j, socket, partsToSend[2], x, offset;
+	/*
+	 * USERNAME\n
+	 * PASSWORD\n
+	 * put FILE\0
+	 */
+	querySize = strlen(config.username) + strlen(config.password) + strlen(fileName) + 7;
+
+	if ((query = malloc(querySize)) == NULL)
+		return -2;
+	sprintf(query, "%s\n%s\nput %s", config.username, config.password, fileName);
+
+	MD5_Init(&context);
+
+
+	if ((file = fopen(fileName, "r")) != NULL) {
+		// hash file
+		while ((bytesRead = fread(readBuffer, sizeof(char), MAX_BUFFER, file)) != 0)
+			MD5_Update(&context, readBuffer, bytesRead);
+		MD5_Final(hash, &context);
+
+		// get file size, return to beginning
+		fileSize = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		offset = (int)mod_big(hash, MD5_DIGEST_LENGTH, 4);
+
+		// parts 1-3 are of size dividedSize, part 4 is remainingSize
+		partSize[0] = partSize[1] = partSize[2] = fileSize / 4;
+		partSize[3] = fileSize - (partSize[0] * 3);
+
+		// open socket loop time
+		for (i = 0; i < 4; i++) {
+			x = (i - offset) % 4;
+
+			partsToSend[0] = x;
+			partsToSend[1] = (x != 3) ? x + 1 : 0;
+
+			if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
+#ifdef DEBUG
+				printf("Copying parts %d and %d\n", partsToSend[0], partsToSend[1]);
+#endif
+				if (send(socket, query, querySize, 0) != -1) {
+					bzero(readBuffer, MAX_BUFFER);
+					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
+					// successful authorization, send the data
+					if (bytesRead > 0 && strcmp("AUTH", readBuffer) == 0) {
+						for (j = 0; j < 2; j++) {
+							// build part header
+							bzero(readBuffer, MAX_BUFFER);
+							sprintf(readBuffer, "%d\n%zd\n", partsToSend[j], partSize[partsToSend[j]]);
+
+							// move to beginning of part
+							fseek(file, partSize[0] * partsToSend[j], SEEK_SET);
+
+							// send part header
+							if (send(socket, readBuffer, strlen(readBuffer), 0) != -1) {
+								for (leftToSend = partSize[partsToSend[j]]; leftToSend > 0; leftToSend -= bytesRead) {
+									currentRead = (leftToSend < MAX_BUFFER) ? leftToSend : MAX_BUFFER;
+									bytesRead = fread(readBuffer, sizeof(char), currentRead, file);
+									send(socket, readBuffer, bytesRead, 0);
+								}
+							}
+						}
+					}
+				}
+				else {
+					perror("Send failure");
+				}
+				close(socket);
+			}
+			else {
+				perror("Socket failure");
+			}
+		}
+
+		fclose(file);
+	}
+	else {
+		return -3;
+	}
+
+	free(query);
+	return 0;
 }

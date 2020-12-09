@@ -14,6 +14,7 @@ int makeSocket(struct addrinfo *info);
 int * pingServers(dfc config);
 int list(dfc config, distributedFile *files, size_t *capacity);
 void *get(dfc config, const char *fileName);
+int put(dfc config, const char *fileName);
 int countOnes(const int *online);
 
 #endif //NETWORK_SYSTEMS_PA4_CLIENT_H

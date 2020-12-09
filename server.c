@@ -36,6 +36,8 @@ int main(int argc, const char *argv[]) {
 	if (numUsers < 0)
 		return 2;
 
+	pthread_mutex_init(&threadMutex, NULL);
+
 	port = (int)strtol(argv[2], NULL, 10);
 	if ((sockfd = makeSocket(port)) >= 0) {
 
@@ -46,6 +48,7 @@ int main(int argc, const char *argv[]) {
 		free(usernames[i]);
 		free(passwords[i]);
 	}
+	pthread_mutex_destroy(&threadMutex);
 	close(sockfd);
 	return 0;
 }

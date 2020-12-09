@@ -171,6 +171,8 @@ void *connectionHandler(void *arguments) {
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "list", 4) == 0) {
 				// list functionality called
+				list(*tArgs);
+				pointInRequest = end;
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "get ", 4) == 0) {
 				// put functionality called

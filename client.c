@@ -209,6 +209,8 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 			if (send(socket, query, querySize, 0) != -1) {
 				// response format: "NAME1.n\nNAME2.n\nNAME3.n\nNAME4.n"
 				while (recv(socket, response, MAX_BUFFER, 0) > 0 && files != NULL) {
+					if (strcmp(response, invalidPasswordResponse) == 0)
+						break;
 					for (line = strtok_r(response, "\n", &lineSavePoint); line != NULL && files != NULL; line = strtok_r(NULL, "\n", &lineSavePoint)) {
 						trimSpace(line);
 						if (strlen(line) == 0)
@@ -479,7 +481,7 @@ int put(dfc config, const char *fileName) {
 					bzero(readBuffer, MAX_BUFFER);
 					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
 					// successful authorization, send the data
-					if (bytesRead > 0 && strcmp("AUTH", readBuffer) == 0) {
+					if (bytesRead > 0 && strcmp(invalidPasswordResponse, readBuffer) != 0) {
 						for (j = 0; j < 2; j++) {
 							// build part header
 							bzero(readBuffer, MAX_BUFFER);

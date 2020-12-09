@@ -172,7 +172,6 @@ void *connectionHandler(void *arguments) {
 				}
 				else {
 					pointInRequest = strtok_r(NULL, "\n", &savePoint);  // jump past password
-					send(tArgs->sockfd, authorizedResponse, strlen(authorizedResponse), 0);
 				}
 			}
 			else if (partDesignation == -1 && fileName == NULL && strncmp(pointInRequest, "list", 4) == 0) {

@@ -485,6 +485,12 @@ int put(dfc config, const char *fileName) {
 							bzero(readBuffer, MAX_BUFFER);
 							sprintf(readBuffer, "%d\n%zd\n", partsToSend[j], partSize[partsToSend[j]]);
 
+							// move to beginning of part
+							fseek(file, partSize[0] * partsToSend[j], SEEK_SET);
+
+							// send part header
+							if (send(socket, readBuffer, strlen(readBuffer), 0) != -1) {
+							}
 						}
 					}
 				}

@@ -40,6 +40,10 @@ int main(int argc, const char *argv[]) {
 
 	port = (int)strtol(argv[2], NULL, 10);
 	if ((sockfd = makeSocket(port)) >= 0) {
+		// loop until SIGINT
+		while (!killed) {
+
+		}
 
 	}
 

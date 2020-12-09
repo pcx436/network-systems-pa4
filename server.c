@@ -206,8 +206,10 @@ int list(threadArgs tArgs, int userIndex) {
 	struct stat st = {0};
 
 	bzero(fileName, PATH_MAX);
-	if (stat(tArgs.dir, &st) == -1) {
-		mkdir(tArgs.dir, 700);
+	sprintf(fileName, "%s/%s", tArgs.dir, tArgs.usernames[userIndex]);
+
+	if (stat(fileName, &st) == -1) {
+		mkdir(fileName, 700);
 	}
 	else {
 		// found directory, list any files

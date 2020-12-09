@@ -12,7 +12,7 @@
 typedef struct {
 	int sockfd;
 	int *numThreads;
-	char *dir;
+	const char *dir;
 	pthread_mutex_t *mutex;
 } threadArgs;
 

@@ -214,7 +214,9 @@ int list(threadArgs tArgs, int userIndex) {
 	}
 	else if ((dirptr = opendir(fileName)) != NULL) {  // succeeded in opening directory
 		while ((ent = readdir(dirptr)) != NULL) {
-			send(tArgs.sockfd, ent->d_name, strlen(ent->d_name), 0);
+			bzero(fileName, PATH_MAX);
+			sprintf(fileName, "%s\n", ent->d_name);
+			send(tArgs.sockfd, fileName, strlen(fileName), 0);
 		}
 		closedir(dirptr);
 	}

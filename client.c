@@ -464,6 +464,10 @@ int put(dfc config, const char *fileName) {
 		partSize[0] = partSize[1] = partSize[2] = fileSize / 4;
 		partSize[3] = fileSize - (partSize[0] * 3);
 
+		// open socket loop time
+		for (i = 0; i < 4; i++) {
+
+		fclose(file);
 	}
 	else {
 		return -2;

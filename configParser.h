@@ -19,5 +19,5 @@ int initDFC(const char *fileName, dfc *config);
 
 void destroyDFC(dfc *config);
 
-char **parseDFS(const char *fileName);
+int parseDFS(const char *fileName, char *usernames, char *passwords);
 #endif //NETWORK_SYSTEMS_PA4_CONFIGPARSER_H

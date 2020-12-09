@@ -11,8 +11,11 @@
 
 typedef struct {
 	int sockfd;
+	int numUsers;
 	int *numThreads;
 	const char *dir;
+	char **usernames;
+	char **passwords;
 	pthread_mutex_t *mutex;
 } threadArgs;
 

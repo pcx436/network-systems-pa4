@@ -293,3 +293,15 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 
 	return returnValue;
 }
+
+int receivePut(threadArgs tArgs, int userIndex) {
+	char buffer[MAX_BUFFER];
+	int i;
+
+	// send ready response
+	send(tArgs.sockfd, ready, strlen(ready), 0);
+
+
+
+	return 0;
+}

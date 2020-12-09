@@ -141,6 +141,9 @@ void *connectionHandler(void *arguments) {
 	size_t bytesReceived;
 	// TODO: things
 
+	while ((bytesReceived = recv(tArgs->sockfd, buffer, MAX_BUFFER, 0)) > 0) {
+	}
+
 	close(tArgs->sockfd);
 
 	pthread_mutex_lock(tArgs->mutex);

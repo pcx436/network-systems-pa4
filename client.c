@@ -459,6 +459,11 @@ int put(dfc config, const char *fileName) {
 		fseek(file, 0, SEEK_SET);
 
 		offset = (int)mod_big(hash, MD5_DIGEST_LENGTH, 4);
+
+		// parts 1-3 are of size dividedSize, part 4 is remainingSize
+		partSize[0] = partSize[1] = partSize[2] = fileSize / 4;
+		partSize[3] = fileSize - (partSize[0] * 3);
+
 	}
 	else {
 		return -2;

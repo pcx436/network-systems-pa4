@@ -211,7 +211,7 @@ int list(threadArgs tArgs, int userIndex) {
 		perror("Failed to create user directory");
 		return -1;
 	}
-	else if ((dirptr = opendir(fileName)) != NULL) {  // succeeded in opening directory
+	if ((dirptr = opendir(fileName)) != NULL) {  // succeeded in opening directory
 		while ((ent = readdir(dirptr)) != NULL) {
 			bzero(fileName, PATH_MAX);
 			sprintf(fileName, "%s\n", ent->d_name);

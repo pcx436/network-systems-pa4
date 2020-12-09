@@ -29,6 +29,19 @@ int main(int argc, const char *argv[]) {
 	if (numUsers < 0)
 		return 2;
 
+	port = (int)strtol(argv[2], NULL, 10);
+	if ((sockfd = makeSocket(port)) >= 0) {
+
+	}
+
+	// free users
+	for (i = 0; i < numUsers; i++) {
+		free(usernames[i]);
+		free(passwords[i]);
+	}
+	close(sockfd);
+	return 0;
+}
 
 int makeSocket(int port) {
 	int sockfd, opt = 1, flags;

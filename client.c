@@ -156,8 +156,15 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 			if (send(socket, query, querySize, 0) != -1) {
 				// response format: "NAME1.n\nNAME2.n\nNAME3.n\nNAME4.n"
 				while (recv(socket, response, MAX_BUFFER, 0) > 0 && files != NULL) {
-					if (strcmp(response, invalidPasswordResponse) == 0)
+					if (strcmp(response, invalidPasswordResponse) == 0) {
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
 						break;
+					}
+					else if (strcmp(response, queryFailure) == 0) {
+						fprintf(stderr, "%s\n", queryFailure);
+						break;
+					}
+
 					for (line = strtok_r(response, "\n", &lineSavePoint); line != NULL && files != NULL; line = strtok_r(NULL, "\n", &lineSavePoint)) {
 						trimSpace(line);
 						if (strlen(line) == 0)
@@ -250,8 +257,14 @@ void *get(dfc config, const char *fileName) {
 				// FIXME: currently assuming that when there is an info block, we can see the whole thing.
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
 					// check for login failure
-					if (justStarted == 1 && strcmp(responseBuffer, invalidPasswordResponse) == 0)
+					if (justStarted == 1 && strcmp(responseBuffer, invalidPasswordResponse) == 0) {
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
 						break;
+					}
+					else if (justStarted == 1 && strcmp(queryFailure, responseBuffer) == 0) {
+						fprintf(stderr, "%s\n", queryFailure);
+						break;
+					}
 					else
 						justStarted = 0;
 
@@ -442,7 +455,7 @@ int put(dfc config, const char *fileName) {
 					bzero(readBuffer, MAX_BUFFER);
 					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
 					// successful authorization, send the data
-					if (bytesRead > 0 && strcmp(invalidPasswordResponse, readBuffer) != 0) {
+					if (bytesRead > 0 && strcmp(ready, readBuffer) == 0) {
 						for (j = 0; j < 2; j++) {
 							// build part header
 							bzero(readBuffer, MAX_BUFFER);
@@ -461,6 +474,12 @@ int put(dfc config, const char *fileName) {
 							}
 						}
 					}
+					else if (bytesRead > 0 && strcmp(invalidPasswordResponse, readBuffer) == 0)
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
+					else if (bytesRead > 0 && strcmp(queryFailure, readBuffer) == 0)
+						fprintf(stderr, "%s\n", queryFailure);
+					else
+						perror("Failure in send");
 				}
 				else {
 					perror("Send failure");

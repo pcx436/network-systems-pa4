@@ -268,12 +268,11 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 			fseek(file, 0, SEEK_SET);
 
 			send(tArgs.sockfd, buffer, strlen(buffer), 0);
-			while ((bytesRead = fread(buffer, sizeof(char), MAX_BUFFER, file)) > 0 && returnValue == 0) {
+			while ((bytesRead = fread(buffer, sizeof(char), MAX_BUFFER, file)) > 0) {
 				if (send(tArgs.sockfd, buffer, bytesRead, 0) == -1) {
 					bzero(buffer, MAX_BUFFER);
 					sprintf(buffer, "Error sending chunk data for %s", nameBuff);
 					perror(buffer);
-					returnValue = -2;
 				}
 			}
 			fclose(file);
@@ -282,7 +281,6 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 			bzero(buffer, MAX_BUFFER);
 			sprintf(buffer, "Failed to open file %s", nameBuff);
 			perror(buffer);
-			returnValue = -1;
 		}
 	}
 

@@ -285,6 +285,7 @@ void *get(dfc config, const char *fileName) {
 							}
 							else {
 								fprintf(stderr, "Invalid file part designation received.\n");
+								pointInResponse = end;
 							}
 						}
 						else if (partSize[partDesignation] == 0) {

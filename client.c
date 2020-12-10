@@ -174,7 +174,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 
 						for (j = 0, fileIndex = -1; j < numFiles && fileIndex == -1; j++) {
 							if (strcmp(files[j].name, line) == 0) {
-								files[j].parts[fileDesignation - 1] = 1;
+								files[j].parts[fileDesignation] = 1;
 								fileIndex = j;
 							}
 						}

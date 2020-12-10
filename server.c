@@ -17,6 +17,7 @@
 #include <dirent.h>
 #include <signal.h>
 #include <errno.h>
+#include <ctype.h>
 
 int main(int argc, const char *argv[]) {
 	signal(SIGINT, handler);
@@ -189,16 +190,10 @@ void *connectionHandler(void *arguments) {
 				// put functionality called
 				pointInRequest += 4;
 				bytesReceived -= 4;
-				if ((endlToken = strchr(pointInRequest, '\n')) != NULL) {
-					endlToken[0] = '\0';
-					printf("Put called with file %s\n", pointInRequest);
+				printf("Put called with file %s\n", pointInRequest);
+				receivePut(*tArgs, userIndex, pointInRequest);
 
-					pointInRequest = endlToken + 1;
-				}
-				else {
-					perror("No file with put?");
-					pointInRequest = end;
-				}
+				pointInRequest = end;
 			}
 			else {
 				// TODO: What was the response supposed to be?

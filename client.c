@@ -266,11 +266,13 @@ void *get(dfc config, const char *fileName) {
 						// have seen a part, have to skip it
 						if (skipCount > 0 && skipCount <= bytesReceived) {
 							pointInResponse += skipCount;
+							bytesReceived -= skipCount;
 							skipCount = 0;
 							partDesignation = -1;  // skipped finished
 						}
 						else if (skipCount > 0) {  // skipCount exceeds buffer limits
 							skipCount -= bytesReceived;
+							bytesReceived = 0;
 							pointInResponse = end;
 						}
 						else if ((partDesignation == -1 || partSize[partDesignation] == 0) && pointInResponse[0] == '\n') {

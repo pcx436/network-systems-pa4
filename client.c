@@ -272,12 +272,12 @@ void *get(dfc config, const char *fileName) {
 						}
 						else if (skipCount > 0) {  // skipCount exceeds buffer limits
 							skipCount -= bytesReceived;
-							bytesReceived = 0;
 							pointInResponse = end;
 						}
 						else if ((partDesignation == -1 || partSize[partDesignation] == 0) && pointInResponse[0] == '\n') {
 							// skip newline
 							pointInResponse += 1;
+							bytesReceived--;
 						}
 						else if (partDesignation == -1) {  // current character is the buffer designation
 							if (isdigit(pointInResponse[0])) {
@@ -323,6 +323,12 @@ void *get(dfc config, const char *fileName) {
 						}
 						else if (partSize[partDesignation] == currentSize[partDesignation]) {
 							skipCount = partSize[partDesignation];
+							token = strchr(pointInResponse, '\n');
+
+							token[0] = '\0';
+							bytesReceived -= strlen(pointInResponse) + 1;
+							token[0] = '\n';
+
 							pointInResponse = strchr(pointInResponse, '\n') + 1;  // skip past chunk size
 						}
 						else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping

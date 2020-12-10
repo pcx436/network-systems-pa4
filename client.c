@@ -15,7 +15,7 @@
 
 int main(int argc, const char *argv[]) {
 	dfc config;
-	distributedFile *files;
+	distributedFile *files = NULL;
 	size_t fileCapacity;
 	char fullCommand[MAX_COMMAND], *tokenSave, *param, *fileName;
 	int exit = 0, numFiles, anyMissing;
@@ -50,6 +50,7 @@ int main(int argc, const char *argv[]) {
 			}
 			else {
 				fileCapacity = START_LIST_FILES;
+
 				numFiles = list(config, files, &fileCapacity);
 
 				// print list

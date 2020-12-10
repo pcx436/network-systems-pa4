@@ -138,58 +138,6 @@ int makeSocket(struct addrinfo *info) {
 	return sockfd;
 }
 
-int * pingServers(dfc config) {
-	int i, socket, *online, error;
-	char *pingCommand;
-	char response[MAX_BUFFER];
-	// 7 = 2 \n + 1 \0 + "ping"
-	size_t pingSize = strlen(config.username) + strlen(config.password) + 7, ioSize;
-
-	if ((online = malloc(sizeof(int) * 4)) == NULL)
-		return NULL;
-
-	// default 0 offline, 1 if online
-	for (i = 0; i < 4; i++)
-		online[i] = 0;
-
-	if ((pingCommand = malloc(sizeof(char) * pingSize)) == NULL) {
-		free(online);
-		return NULL;
-	}
-	// build ping command
-	sprintf(pingCommand, "%s\n%s\nping", config.username, config.password);
-
-	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
-
-			if ((ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) > 0) {
-				ioSize = recv(socket, response, 1024, 0);
-				if (strncmp("pong", response, 4) == 0)
-					online[i] = 1;
-			}
-			close(socket);
-		} else {
-			fprintf(stderr, "failed to ping servers!\n");
-			i = 5;  // break
-		}
-	}
-
-	free(pingCommand);
-	return online;
-}
-
-int countOnes(const int *online) {
-	int c = 0, i;
-	if (online == NULL)
-		return -1;
-
-	for (i = 0; i < 4; i++)
-		if (online[i] == 1)
-			c++;
-
-	return c;
-}
-
 int list(dfc config, distributedFile *files, size_t *capacity) {
 	int i, j, socket, numFiles = 0,
 	fileDesignation, fileIndex;

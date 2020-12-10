@@ -10,11 +10,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <openssl/md5.h>
 // TODO: Implement AES encryption?
 
 int main(int argc, const char *argv[]) {
 	dfc config;
-	distributedFile *files;
+	distributedFile *files = NULL;
 	size_t fileCapacity;
 	char fullCommand[MAX_COMMAND], *tokenSave, *param, *fileName;
 	int exit = 0, numFiles, anyMissing;
@@ -49,6 +50,7 @@ int main(int argc, const char *argv[]) {
 			}
 			else {
 				fileCapacity = START_LIST_FILES;
+
 				numFiles = list(config, files, &fileCapacity);
 
 				// print list
@@ -62,12 +64,18 @@ int main(int argc, const char *argv[]) {
 					if (anyMissing == 1)
 						printf(" [incomplete]");
 					printf("\n");
-
-					free(files[i].name);
 				}
 				free(files);
 			}
 		} else if (strncmp("put ", fullCommand, 4) == 0) {
+			if (strlen(fullCommand) > 4) {
+				fileName = fullCommand + 4;
+				trimSpace(fileName);
+				put(config, fileName);
+			}
+			else {
+				fprintf(stderr, "Please specify a file to retrieve.\n");
+			}
 		} else if (strncmp("get ", fullCommand, 4) == 0) {
 			if (strlen(fullCommand) > 4) {
 				fileName = fullCommand + 4;
@@ -131,58 +139,6 @@ int makeSocket(struct addrinfo *info) {
 	return sockfd;
 }
 
-int * pingServers(dfc config) {
-	int i, socket, *online, error;
-	char *pingCommand;
-	char response[MAX_BUFFER];
-	// 7 = 2 \n + 1 \0 + "ping"
-	size_t pingSize = strlen(config.username) + strlen(config.password) + 7, ioSize;
-
-	if ((online = malloc(sizeof(int) * 4)) == NULL)
-		return NULL;
-
-	// default 0 offline, 1 if online
-	for (i = 0; i < 4; i++)
-		online[i] = 0;
-
-	if ((pingCommand = malloc(sizeof(char) * pingSize)) == NULL) {
-		free(online);
-		return NULL;
-	}
-	// build ping command
-	sprintf(pingCommand, "%s\n%s\nping", config.username, config.password);
-
-	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
-
-			if ((ioSize = send(socket, pingCommand, strlen(pingCommand), 0)) > 0) {
-				ioSize = recv(socket, response, 1024, 0);
-				if (strncmp("pong", response, 4) == 0)
-					online[i] = 1;
-			}
-			close(socket);
-		} else {
-			fprintf(stderr, "failed to ping servers!\n");
-			i = 5;  // break
-		}
-	}
-
-	free(pingCommand);
-	return online;
-}
-
-int countOnes(const int *online) {
-	int c = 0, i;
-	if (online == NULL)
-		return -1;
-
-	for (i = 0; i < 4; i++)
-		if (online[i] == 1)
-			c++;
-
-	return c;
-}
-
 int list(dfc config, distributedFile *files, size_t *capacity) {
 	int i, j, socket, numFiles = 0,
 	fileDesignation, fileIndex;
@@ -196,10 +152,19 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 	sprintf(query, "%s\n%s\nlist", config.username, config.password);
 
 	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
+		if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
 			if (send(socket, query, querySize, 0) != -1) {
 				// response format: "NAME1.n\nNAME2.n\nNAME3.n\nNAME4.n"
 				while (recv(socket, response, MAX_BUFFER, 0) > 0 && files != NULL) {
+					if (strcmp(response, invalidPasswordResponse) == 0) {
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
+						break;
+					}
+					else if (strcmp(response, queryFailure) == 0) {
+						fprintf(stderr, "%s\n", queryFailure);
+						break;
+					}
+
 					for (line = strtok_r(response, "\n", &lineSavePoint); line != NULL && files != NULL; line = strtok_r(NULL, "\n", &lineSavePoint)) {
 						trimSpace(line);
 						if (strlen(line) == 0)
@@ -216,7 +181,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 
 						for (j = 0, fileIndex = -1; j < numFiles && fileIndex == -1; j++) {
 							if (strcmp(files[j].name, line) == 0) {
-								files[j].parts[fileDesignation - 1] = 1;
+								files[j].parts[fileDesignation] = 1;
 								fileIndex = j;
 							}
 						}
@@ -230,9 +195,11 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 								}
 							}
 
-							if (files != NULL && (files[numFiles].name = malloc(strlen(line) + 1)) != NULL) {
+							if (files != NULL) {
+								bzero(files[numFiles].name, PATH_MAX);
 								strcpy(files[numFiles].name, line);
-								bzero(files[numFiles].parts, 4);
+								for (j = 0; j < 4; j++)
+									files[numFiles].parts[j] = 0;
 
 								files[numFiles++].parts[fileDesignation - 1] = 1;
 							}
@@ -274,7 +241,7 @@ void *get(dfc config, const char *fileName) {
 
 	// init partSize and parts arrays
 	for (i = 0; i < 4; i++) {
-		partSize[i] = -1;
+		partSize[i] = 0;
 		currentSize[i] = 0;
 		parts[i] = NULL;
 	}
@@ -283,12 +250,21 @@ void *get(dfc config, const char *fileName) {
 	for (socketIndex = 0; socketIndex < 4; socketIndex++) {
 		if ((socket = makeSocket(config.serverInfo[socketIndex])) >= 0) {
 			if (send(socket, query, queryLength, 0) != -1) {
+				justStarted = 1;
+				partDesignation = -1;
+				skipCount = 0;
 				// FIXME: adapt to malformed responses
 				// FIXME: currently assuming that when there is an info block, we can see the whole thing.
 				while ((bytesReceived = recv(socket, responseBuffer, MAX_BUFFER, 0)) > 0) {
 					// check for login failure
-					if (justStarted == 1 && strcmp(responseBuffer, invalidPasswordResponse) == 0)
+					if (justStarted == 1 && strcmp(responseBuffer, invalidPasswordResponse) == 0) {
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
 						break;
+					}
+					else if (justStarted == 1 && strcmp(queryFailure, responseBuffer) == 0) {
+						fprintf(stderr, "%s\n", queryFailure);
+						break;
+					}
 					else
 						justStarted = 0;
 
@@ -303,6 +279,7 @@ void *get(dfc config, const char *fileName) {
 						// have seen a part, have to skip it
 						if (skipCount > 0 && skipCount <= bytesReceived) {
 							pointInResponse += skipCount;
+							bytesReceived -= skipCount;
 							skipCount = 0;
 							partDesignation = -1;  // skipped finished
 						}
@@ -310,21 +287,23 @@ void *get(dfc config, const char *fileName) {
 							skipCount -= bytesReceived;
 							pointInResponse = end;
 						}
-						else if ((partDesignation == -1 || partSize[partDesignation] == -1) && pointInResponse[0] == '\n') {
+						else if ((partDesignation == -1 || partSize[partDesignation] == 0) && pointInResponse[0] == '\n') {
 							// skip newline
 							pointInResponse += 1;
+							bytesReceived--;
 						}
 						else if (partDesignation == -1) {  // current character is the buffer designation
 							if (isdigit(pointInResponse[0])) {
-								partDesignation = (int)strtol(pointInResponse, NULL, 10) - 1;
+								partDesignation = (int)strtol(pointInResponse, NULL, 10);
 								pointInResponse += 2;  // skip designation and newline
 								bytesReceived -= 2;
 							}
 							else {
 								fprintf(stderr, "Invalid file part designation received.\n");
+								pointInResponse = end;
 							}
 						}
-						else if (partSize[partDesignation] == -1) {
+						else if (partSize[partDesignation] == 0) {
 							// found the end of the part size
 							if ((token = strchr(pointInResponse, '\n')) != NULL) {
 								token[0] = '\0';
@@ -339,19 +318,15 @@ void *get(dfc config, const char *fileName) {
 								pointInResponse = token + 1;
 
 								// new part
-								if (partSize[partDesignation] == -1) {
-									skipCount = 0;
-									partSize[partDesignation] = parsedSize;
+								skipCount = 0;
+								partSize[partDesignation] = parsedSize;
 
-									// if there is a higher power, I beg of them to never let this condition be true
-									if ((parts[partDesignation] = malloc(parsedSize)) == NULL) {
-										perror("Failed allocating space for file part");
-										partSize[partDesignation] = -1;
-										partDesignation = -1;
-										pointInResponse = end;
-									}
-								} else {  // seen part, skip it
-									skipCount = parsedSize;
+								// if there is a higher power, I beg of them to never let this condition be true
+								if ((parts[partDesignation] = malloc(parsedSize)) == NULL) {
+									perror("Failed allocating space for file part");
+									partSize[partDesignation] = 0;
+									partDesignation = -1;
+									pointInResponse = end;
 								}
 							}
 							else {  // have yet to see end of part size specification
@@ -359,13 +334,23 @@ void *get(dfc config, const char *fileName) {
 								pointInResponse = end;
 							}
 						}
-						else {  // partDesignation != -1, partSize[partDesignation] != -1, not skipping
+						else if (partSize[partDesignation] == currentSize[partDesignation]) {
+							skipCount = partSize[partDesignation];
+							token = strchr(pointInResponse, '\n');
+
+							token[0] = '\0';
+							bytesReceived -= strlen(pointInResponse) + 1;
+							token[0] = '\n';
+
+							pointInResponse = strchr(pointInResponse, '\n') + 1;  // skip past chunk size
+						}
+						else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping
 							// determine if current file takes up entire received buffer or only part
 							remainder = partSize[partDesignation] - currentSize[partDesignation];
-							if (bytesReceived <= remainder)
-								toCopy = bytesReceived;
-							else
+							if (remainder <= bytesReceived)
 								toCopy = remainder;
+							else
+								toCopy = bytesReceived;
 
 							// "append" received bytes to the end of the part in question
 							memcpy(parts[partDesignation] + currentSize[partDesignation], pointInResponse, toCopy);
@@ -412,4 +397,106 @@ void *get(dfc config, const char *fileName) {
 			free(parts[i]);
 
 	return NULL;
+}
+
+int put(dfc config, const char *fileName) {
+	if (fileName == NULL)
+		return -1;
+
+	unsigned char hash[MD5_DIGEST_LENGTH];
+	FILE *file;
+	char readBuffer[MAX_BUFFER], *query;
+	MD5_CTX context;
+	size_t bytesRead, querySize, leftToSend, currentRead;
+	ssize_t fileSize, partSize[4];
+	int i, j, socket, partsToSend[2], x, offset;
+	/*
+	 * USERNAME\n
+	 * PASSWORD\n
+	 * put FILE\0
+	 */
+	querySize = strlen(config.username) + strlen(config.password) + strlen(fileName) + 7;
+
+	if ((query = malloc(querySize)) == NULL)
+		return -2;
+	sprintf(query, "%s\n%s\nput %s", config.username, config.password, fileName);
+
+	MD5_Init(&context);
+
+
+	if ((file = fopen(fileName, "r")) != NULL) {
+		// hash file
+		while ((bytesRead = fread(readBuffer, sizeof(char), MAX_BUFFER, file)) != 0)
+			MD5_Update(&context, readBuffer, bytesRead);
+		MD5_Final(hash, &context);
+
+		// get file size, return to beginning
+		fileSize = ftell(file);
+		fseek(file, 0, SEEK_SET);
+
+		offset = (int)mod_big(hash, MD5_DIGEST_LENGTH, 4);
+
+		// parts 1-3 are of size dividedSize, part 4 is remainingSize
+		partSize[0] = partSize[1] = partSize[2] = fileSize / 4;
+		partSize[3] = fileSize - (partSize[0] * 3);
+
+		// open socket loop time
+		for (i = 0; i < 4; i++) {
+			x = (i - offset) % 4;
+
+			partsToSend[0] = x;
+			partsToSend[1] = (x != 3) ? x + 1 : 0;
+
+			if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
+#ifdef DEBUG
+				printf("Copying parts %d and %d\n", partsToSend[0], partsToSend[1]);
+#endif
+				if (send(socket, query, querySize, 0) != -1) {
+					bzero(readBuffer, MAX_BUFFER);
+					bytesRead = recv(socket, readBuffer, MAX_BUFFER, 0);
+					// successful authorization, send the data
+					if (bytesRead > 0 && strcmp(ready, readBuffer) == 0) {
+						for (j = 0; j < 2; j++) {
+							// build part header
+							bzero(readBuffer, MAX_BUFFER);
+							sprintf(readBuffer, "%d\n%zd\n", partsToSend[j], partSize[partsToSend[j]]);
+
+							// move to beginning of part
+							fseek(file, partSize[0] * partsToSend[j], SEEK_SET);
+
+							// send part header
+							if (send(socket, readBuffer, strlen(readBuffer), 0) != -1) {
+								for (leftToSend = partSize[partsToSend[j]]; leftToSend > 0; leftToSend -= bytesRead) {
+									currentRead = (leftToSend < MAX_BUFFER) ? leftToSend : MAX_BUFFER;
+									bytesRead = fread(readBuffer, sizeof(char), currentRead, file);
+									send(socket, readBuffer, bytesRead, 0);
+								}
+							}
+						}
+					}
+					else if (bytesRead > 0 && strcmp(invalidPasswordResponse, readBuffer) == 0)
+						fprintf(stderr, "%s\n", invalidPasswordResponse);
+					else if (bytesRead > 0 && strcmp(queryFailure, readBuffer) == 0)
+						fprintf(stderr, "%s\n", queryFailure);
+					else
+						perror("Failure in send");
+				}
+				else {
+					perror("Send failure");
+				}
+				close(socket);
+			}
+			else {
+				perror("Socket failure");
+			}
+		}
+
+		fclose(file);
+	}
+	else {
+		return -3;
+	}
+
+	free(query);
+	return 0;
 }

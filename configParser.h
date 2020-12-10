@@ -2,12 +2,12 @@
 // Created by jmalcy on 12/5/20.
 //
 
-#ifndef NETWORK_SYSTEMS_PA4_CONFIGPARSER_H
-#define NETWORK_SYSTEMS_PA4_CONFIGPARSER_H
-
 #include "macro.h"
 #include <sys/socket.h>
 #include <netdb.h>
+
+#ifndef NETWORK_SYSTEMS_PA4_CONFIGPARSER_H
+#define NETWORK_SYSTEMS_PA4_CONFIGPARSER_H
 
 typedef struct {
 	struct addrinfo *serverInfo[4];

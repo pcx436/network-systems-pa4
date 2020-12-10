@@ -287,14 +287,94 @@ int receiveGet(threadArgs tArgs, int userIndex, char *fileName) {
 	return returnValue;
 }
 
-int receivePut(threadArgs tArgs, int userIndex) {
-	char buffer[MAX_BUFFER];
-	int i;
+int receivePut(threadArgs tArgs, int userIndex, char *fileName) {
+	char buffer[MAX_BUFFER], *pointInRequest, *end, *token, sizeBuffer[MAX_BUFFER],
+	// 5 = [dir]/[uname]/[fname].partNum\0
+	nameBuffer[strlen(tArgs.dir) + strlen(tArgs.usernames[userIndex]) + strlen(fileName) + 5];
+	int i, partDesignation = -1;
+	size_t bytesReceived, currentPartSize = 0, remainder, writeResult, bytesWritten = 0, toWrite;
+	FILE *file = NULL;
+	bzero(sizeBuffer, MAX_BUFFER);
 
 	// send ready response
 	send(tArgs.sockfd, ready, strlen(ready), 0);
 
+	while ((bytesReceived = recv(tArgs.sockfd, buffer, MAX_BUFFER, 0)) > 0) {
+		// set pointInRequest to start of buffer
+		pointInRequest = buffer;
 
+		// keep track of end pointer
+		end = buffer + bytesReceived;
+
+		// still data left in buffer
+		while (pointInRequest < end) {
+			if ((partDesignation == -1 || currentPartSize == 0) && pointInRequest[0] == '\n') {
+				// skip newline
+				pointInRequest += 1;
+			}
+			else if (partDesignation == -1) {  // current character is the buffer designation
+				if (isdigit(pointInRequest[0])) {
+					partDesignation = (int)strtol(pointInRequest, NULL, 10);
+					pointInRequest += 2;  // skip designation and newline
+					bytesReceived -= 2;
+					sprintf(nameBuffer, "%s/%s/%s.%d", tArgs.dir, tArgs.usernames[userIndex], fileName, partDesignation);
+
+					if ((file = fopen(nameBuffer, "w")) == NULL) {
+						pointInRequest = end;
+						perror(nameBuffer);
+					}
+				}
+				else {
+					fprintf(stderr, "Invalid file part designation received.\n");
+				}
+			}
+			else if (currentPartSize == 0) {
+				// found the end of the part size
+				if ((token = strchr(pointInRequest, '\n')) != NULL) {
+					token[0] = '\0';
+					strcat(sizeBuffer, pointInRequest);
+
+					currentPartSize = strtol(sizeBuffer, NULL, 10);
+					bzero(sizeBuffer, MAX_BUFFER);  // wipe for next block
+					bytesReceived -= strlen(pointInRequest) + 1;  // "file size" + \n
+					token[0] = '\n';
+
+					// start at data chunk
+					pointInRequest = token + 1;
+				}
+				else {  // have yet to see end of part size specification
+					strcat(sizeBuffer, pointInRequest);
+					pointInRequest = end;
+				}
+			}
+			else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping
+				// determine if current file takes up entire received buffer or only part
+				remainder = currentPartSize - bytesWritten;
+				if (bytesReceived <= remainder)
+					toWrite = bytesReceived;
+				else
+					toWrite = remainder;
+
+				// "append" received bytes to the end of the part in question
+				if ((writeResult = fwrite(pointInRequest, sizeof(char), toWrite, file)) <= 0) {
+					perror(nameBuffer);
+					pointInRequest = end;
+					fclose(file);
+				}
+
+				if (toWrite == remainder || bytesReceived == remainder) {
+					partDesignation = -1;
+					currentPartSize = 0;
+					fclose(file);
+					file = NULL;
+				}
+
+				// shift pointInRequest in reaction to copy
+				pointInRequest += toWrite;
+				bytesReceived -= toWrite;
+			}
+		}
+	}
 
 	return 0;
 }

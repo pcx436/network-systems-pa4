@@ -63,8 +63,6 @@ int main(int argc, const char *argv[]) {
 					if (anyMissing == 1)
 						printf(" [incomplete]");
 					printf("\n");
-
-					free(files[i].name);
 				}
 				free(files);
 			}
@@ -241,9 +239,11 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 								}
 							}
 
-							if (files != NULL && (files[numFiles].name = malloc(strlen(line) + 1)) != NULL) {
+							if (files != NULL) {
+								bzero(files[numFiles].name, PATH_MAX);
 								strcpy(files[numFiles].name, line);
-								bzero(files[numFiles].parts, 4);
+								for (j = 0; j < 4; j++)
+									files[numFiles].parts[j] = 0;
 
 								files[numFiles++].parts[fileDesignation - 1] = 1;
 							}

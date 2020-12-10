@@ -5,10 +5,11 @@
 #ifndef NETWORK_SYSTEMS_PA4_COMMON_H
 #define NETWORK_SYSTEMS_PA4_COMMON_H
 #include <stddef.h>
+#include <limits.h>
 
 typedef struct {
 	int parts[4];
-	char *name;
+	char name[PATH_MAX];
 } distributedFile;
 
 void trimSpace(char *s);

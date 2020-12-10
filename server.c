@@ -196,7 +196,8 @@ void *connectionHandler(void *arguments) {
 				pointInRequest = end;
 			}
 			else {
-				// TODO: What was the response supposed to be?
+				send(tArgs->sockfd, queryFailure, strlen(queryFailure), 0);
+				pointInRequest = end;
 			}
 		}
 	}

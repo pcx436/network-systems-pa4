@@ -351,10 +351,10 @@ int receivePut(threadArgs tArgs, int userIndex, char *fileName) {
 			else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping
 				// determine if current file takes up entire received buffer or only part
 				remainder = currentPartSize - bytesWritten;
-				if (bytesReceived <= remainder)
-					toWrite = bytesReceived;
-				else
+				if (remainder <= bytesReceived)
 					toWrite = remainder;
+				else
+					toWrite = bytesReceived;
 
 				// "append" received bytes to the end of the part in question
 				if ((writeResult = fwrite(pointInRequest, sizeof(char), toWrite, file)) <= 0) {

@@ -334,10 +334,10 @@ void *get(dfc config, const char *fileName) {
 						else {  // partDesignation != -1, partSize[partDesignation] != 0, not skipping
 							// determine if current file takes up entire received buffer or only part
 							remainder = partSize[partDesignation] - currentSize[partDesignation];
-							if (bytesReceived <= remainder)
-								toCopy = bytesReceived;
-							else
+							if (remainder <= bytesReceived)
 								toCopy = remainder;
+							else
+								toCopy = bytesReceived;
 
 							// "append" received bytes to the end of the part in question
 							memcpy(parts[partDesignation] + currentSize[partDesignation], pointInResponse, toCopy);

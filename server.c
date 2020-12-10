@@ -311,6 +311,7 @@ int receivePut(threadArgs tArgs, int userIndex, char *fileName) {
 			if ((partDesignation == -1 || currentPartSize == 0) && pointInRequest[0] == '\n') {
 				// skip newline
 				pointInRequest += 1;
+				bytesReceived--;
 			}
 			else if (partDesignation == -1) {  // current character is the buffer designation
 				if (isdigit(pointInRequest[0])) {
@@ -363,16 +364,18 @@ int receivePut(threadArgs tArgs, int userIndex, char *fileName) {
 					fclose(file);
 				}
 
-				if (toWrite == remainder || bytesReceived == remainder) {
+				bytesWritten += writeResult;
+				if (bytesWritten == currentPartSize) {
 					partDesignation = -1;
 					currentPartSize = 0;
+					bytesWritten = 0;
 					fclose(file);
 					file = NULL;
 				}
 
 				// shift pointInRequest in reaction to copy
-				pointInRequest += toWrite;
-				bytesReceived -= toWrite;
+				pointInRequest += writeResult;
+				bytesReceived -= writeResult;
 			}
 		}
 	}

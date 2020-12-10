@@ -151,7 +151,7 @@ int list(dfc config, distributedFile *files, size_t *capacity) {
 	sprintf(query, "%s\n%s\nlist", config.username, config.password);
 
 	for (i = 0; i < 4; i++) {
-		if ((socket = makeSocket(config.serverInfo[i])) != -1) {
+		if ((socket = makeSocket(config.serverInfo[i])) >= 0) {
 			if (send(socket, query, querySize, 0) != -1) {
 				// response format: "NAME1.n\nNAME2.n\nNAME3.n\nNAME4.n"
 				while (recv(socket, response, MAX_BUFFER, 0) > 0 && files != NULL) {

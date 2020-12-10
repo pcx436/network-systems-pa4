@@ -326,6 +326,7 @@ int receivePut(threadArgs tArgs, int userIndex, char *fileName) {
 				}
 				else {
 					fprintf(stderr, "Invalid file part designation received.\n");
+					pointInRequest = end;
 				}
 			}
 			else if (currentPartSize == 0) {

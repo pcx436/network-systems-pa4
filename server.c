@@ -167,7 +167,7 @@ void *connectionHandler(void *arguments) {
 							userIndex = i;
 					}
 				}
-				if (!userIndex) {
+				if (userIndex == -1) {
 					send(tArgs->sockfd, invalidPasswordResponse, strlen(invalidPasswordResponse), 0);
 					pointInRequest = end;  // break inner loop
 				}
